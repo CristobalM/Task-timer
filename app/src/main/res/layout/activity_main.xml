@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.cristobalm.myapplication.MainActivity">
+    tools:context="com.example.cristobalm.myapplication.UI.MainActivity">
 
     <Button
         android:id="@+id/button_play"
@@ -52,16 +52,22 @@
         android:textColor="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/ScrollView"
         android:layout_below="@+id/button_add"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="12dp"
+        android:layout_centerHorizontal="true"
+        >
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:orientation="vertical"
-            android:id="@+id/et_list" />
+            android:id="@+id/et_list"
+            android:layout_gravity="center_horizontal"
+            />
     </ScrollView>
 
 </RelativeLayout>

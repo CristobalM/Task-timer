@@ -1,10 +1,13 @@
-package com.example.cristobalm.myapplication;
+package com.example.cristobalm.myapplication.UI;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.LinearLayout;
+
+import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
+import com.example.cristobalm.myapplication.MyBroadcastReceiver;
 
 import java.util.ArrayList;
 
@@ -31,16 +34,16 @@ class ButtonAction {
             return;
         }
         switch (button_name){
-            case ButtonName.BUTTON_STOP:
+            case ButtonNameGlobals.BUTTON_STOP:
                 onClickButtonStop();
                 break;
-            case ButtonName.BUTTON_PLAY:
+            case ButtonNameGlobals.BUTTON_PLAY:
                 onClickButtonPlay();
                 break;
-            case ButtonName.BUTTON_PAUSE:
+            case ButtonNameGlobals.BUTTON_PAUSE:
                 onClickButtonPause();
                 break;
-            case ButtonName.BUTTON_ADD:
+            case ButtonNameGlobals.BUTTON_ADD:
                 onClickButtonAdd();
                 break;
         }
@@ -58,7 +61,7 @@ class ButtonAction {
         Intent intent = new Intent(context, MyBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 234324243, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (firstval*1000), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (firstval*1000 * 60), pendingIntent);
     }
     private void onClickButtonPause(){
         //Toast.makeText(context, "Click on button " + button_name, Toast.LENGTH_SHORT).show();
@@ -66,16 +69,21 @@ class ButtonAction {
     }
     private void onClickButtonAdd(){
         //Toast.makeText(context, "Click on button " + button_name, Toast.LENGTH_SHORT).show();
-        ArrayList<TimeFields> time_fields = caller_instance.getTime_fields();
+        ArrayList<Timefield> time_fields = caller_instance.getTime_fields();
         LinearLayout et_list = caller_instance.getEt_list();
 
 
-        TimeFields time_f_single = new TimeFields(context, time_fields.size(), caller_instance);
+        Timefield time_f_single = new Timefield(context, time_fields.size(), caller_instance);
 
 
         time_fields.add(time_f_single);
         et_list.addView(time_f_single.getLayout());
 
+
         //Log.d("ButtonAction","Size of stuff is:" + String.valueOf(edit_texts.size()));
     }
+
+
+
+
 }
