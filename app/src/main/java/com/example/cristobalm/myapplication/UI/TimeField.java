@@ -7,8 +7,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
+import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 import com.example.cristobalm.myapplication.UI.Listeners.Click.TimeFieldDelOnClickListener;
 import com.example.cristobalm.myapplication.UI.Listeners.Click.TimeFieldUpDownOnClickListener;
@@ -27,41 +27,57 @@ public class Timefield {
     private int index;
     private MainActivity main_activity;
 
+    private EditText hours_input;
     private EditText minutes_input;
+    private EditText seconds_input;
     private EditText edit_text;
 
     private String pre_custom_text;
+    private String pre_hours;
     private String pre_minutes;
+    private String pre_seconds;
+    private TimeContainer time_container;
+
+    private Button del_button;
+    private Button moveup_button;
+    private Button movedown_button;
 
     Timefield(Context context, int index, MainActivity main_activity){
         this.context = context;
         this.index = index;
         pre_custom_text = "";
-        pre_minutes= "0";
+        pre_hours= "00";
+        pre_minutes= "00";
+        pre_seconds= "00";
 
         startTimefieldView(main_activity);
 
         Log.d("Timefield", "created new time field with index:"+String.valueOf(index));
     }
-    public Timefield(Context context, int index, String custom_text, String minutes){
+    public Timefield(Context context, int index, String custom_text, int milliseconds){
         this.context = context;
         this.index = index;
         pre_custom_text = custom_text;
-        pre_minutes = minutes;
+        time_container = new TimeContainer(milliseconds);
+        pre_hours = String.valueOf(time_container.getHours());
+        pre_minutes = String.valueOf(time_container.getMinutes());
+        pre_seconds = String.valueOf(time_container.getSeconds());
     }
 
     void startTimefieldView(MainActivity activity){
         this.main_activity = activity;
         initLayout();
         edit_text = createEditText(pre_custom_text);
-        minutes_input = createMinutesInput(pre_minutes);
-        Button del_button = createDelButton();
-        Button moveup_button = createMoveUpButton();
-        Button movedown_button = createMoveDownButton();
-        TextView minutes_text = createMinutesText();
+        hours_input = createTimeInput(pre_hours);
+        minutes_input = createTimeInput(pre_minutes);
+        seconds_input = createTimeInput(pre_seconds);
+        del_button = createDelButton();
+        moveup_button = createMoveUpButton();
+        movedown_button = createMoveDownButton();
 
+        horizontal_fields_options.addView(hours_input);
         horizontal_fields_options.addView(minutes_input);
-        horizontal_fields_options.addView(minutes_text);
+        horizontal_fields_options.addView(seconds_input);
         horizontal_fields_options.addView(edit_text);
         horizontal_fields_options.addView(del_button);
         horizontal_fields_options.addView(moveup_button);
@@ -100,13 +116,14 @@ public class Timefield {
         edit_text.setText(text);
         return edit_text;
     }
-    private EditText createMinutesInput(String minutes){
+    private EditText createTimeInput(String text){
         EditText timer = new EditText(context);
         timer.setLayoutParams(newLayoutParams(80, 70));
-        timer.setTag("MinutesInput_EditText_" + String.valueOf(getListSize()));
+        timer.setTag("TimeInput_EditText_" + String.valueOf(getListSize()));
         timer.setTextColor(Color.BLACK);
         timer.setInputType(InputType.TYPE_CLASS_NUMBER);
-        timer.setText(minutes);
+        timer.setText(text);
+        timer.setCursorVisible(false);
         return timer;
     }
     private Button createDelButton(){
@@ -130,14 +147,6 @@ public class Timefield {
         movedown_button.setBackgroundResource(R.drawable.ic_arrow_downward_black_24px);
         return movedown_button;
     }
-    private TextView createMinutesText(){
-        TextView s_text = new TextView(context);
-        s_text.setLayoutParams(newLayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 50));
-        s_text.setText(R.string.minutes_list_);
-        s_text.setTextColor(Color.BLACK);
-        return s_text;
-    }
-
 
     void setIndex(int i){
         this.index = i;
@@ -156,8 +165,35 @@ public class Timefield {
         return main_activity.getTime_fields().size();
     }
 
+    public int getHours(){
+        return hours_input != null && hours_input.getText().length() > 0 ?  Integer.parseInt(hours_input.getText().toString()) : 0;
+    }
     public int getMinutes(){
         return minutes_input != null && minutes_input.getText().length() > 0 ?  Integer.parseInt(minutes_input.getText().toString()) : 0;
     }
+    public int getSeconds(){
+        return seconds_input != null && seconds_input.getText().length() > 0 ?  Integer.parseInt(seconds_input.getText().toString()) : 0;
+    }
+    public int getMilliseconds(){
+        return getHours()*60*60*1000 + getMinutes()*60*1000 + getSeconds()*1000;
+    }
+    public void blockInput(){
+        edit_text.setFocusable(false);
+        hours_input.setFocusable(false);
+        minutes_input.setFocusable(false);
+        seconds_input.setFocusable(false);
+        horizontal_fields_options.removeView(del_button);
+        horizontal_fields_options.removeView(moveup_button);
+        horizontal_fields_options.removeView(movedown_button);
+    }
+    public void enableInput(){
+        edit_text.setFocusableInTouchMode(true);
+        hours_input.setFocusableInTouchMode(true);
+        minutes_input.setFocusableInTouchMode(true);
+        seconds_input.setFocusableInTouchMode(true);
 
+        horizontal_fields_options.addView(del_button);
+        horizontal_fields_options.addView(moveup_button);
+        horizontal_fields_options.addView(movedown_button);
+    }
 }

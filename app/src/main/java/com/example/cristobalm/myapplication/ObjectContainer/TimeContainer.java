@@ -2,18 +2,24 @@ package com.example.cristobalm.myapplication.ObjectContainer;
 
 /**
  * Created by cristobalm on 3/3/17.
- * Time container hours minutes seconds
+ * TimeContainer container hours minutes seconds
  */
 
-public class Time {
+public class TimeContainer {
     private int milliseconds;
 
-    public Time(int hours, int minutes, int seconds){
+    public TimeContainer(int milliseconds){
+        this.milliseconds = milliseconds;
+    }
+    public TimeContainer(int hours, int minutes, int seconds){
         milliseconds = toMilliseconds(hours, minutes, seconds);
     }
-    public Time(String hours, String minutes, String seconds){
+    public TimeContainer(String hours, String minutes, String seconds){
         milliseconds = toMilliseconds(Integer.parseInt(hours),
                 Integer.parseInt(minutes), Integer.parseInt(seconds));
+    }
+    public TimeContainer(String milliseconds){
+        this.milliseconds = Integer.parseInt(milliseconds);
     }
 
     private int toMilliseconds(int hours, int minutes, int seconds){
@@ -38,5 +44,10 @@ public class Time {
     }
     private int totalSeconds(){
         return  milliseconds/1000;
+    }
+
+    //TimeContainer time_container = new TimeContainer(times.get(current_timer_index));
+    public String getTimeString() {
+        return String.format("%02d:%02d:%02d", getHours(), getMinutes(), getSeconds());
     }
 }

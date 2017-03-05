@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.example.cristobalm.myapplication.Views.TimeDescription
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_description"
+        android:background="@color/colorPrimary"
+        />
+
+    <com.example.cristobalm.myapplication.Views.TimeCountdownView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_countdown_view"
+        android:layout_toRightOf="@id/time_description"
+        android:background="@color/colorGray"
+        />
+
+    <com.example.cristobalm.myapplication.Views.TimeDraggable
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_draggable"
+        android:layout_toRightOf="@id/time_countdown_view"
+        android:background="@color/colorBlack"
+        />
+
+</merge>

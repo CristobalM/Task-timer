@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="MyBroadcastReceiver" />
+        <receiver android:name=".Services.TimeReceiver" />
         <service android:name=".Services.TimingService" android:exported="false"/>
     </application>
 

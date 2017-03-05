@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Great Timer</string>
     <string name="minutes_list_">mins</string>
     <string name="config_file">config.json</string>
     <item type="id" name="TAG_BUTTON_MAIN_ACT" />

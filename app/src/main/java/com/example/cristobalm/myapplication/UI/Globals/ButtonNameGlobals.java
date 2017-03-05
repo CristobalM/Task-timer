@@ -21,4 +21,23 @@ public class ButtonNameGlobals {
         out.add(BUTTON_ADD);
         return out;
     }
+    public static int getIndexByName(String name){
+        if(name.equals(BUTTON_PLAY)){
+            return 0;
+        }
+        else if(name.equals(BUTTON_STOP)){
+            return 1;
+        }
+        else if(name.equals(BUTTON_PAUSE)){
+            return 2;
+        }
+        else if(name.equals(BUTTON_ADD)){
+            return 3;
+        }
+        else{
+            return -1;
+        }
+    }
+
+
 }

@@ -1,5 +1,10 @@
 package com.example.cristobalm.myapplication.UI;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,7 +12,9 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
@@ -23,7 +30,33 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Timefield> time_fields;
     LinearLayout et_list;
     StateStorage stateStorage;
+    boolean enabled_inputs;
+    boolean mBound;
+    TimingService mService;
+    TimeCountdown current_countdown;
 
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            TimingService.LocalBinder binder = (TimingService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            mService.setTimeList(time_fields);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
+
+    public TimeCountdown createTimeCountDown(TextView time_show,
+                                             int milliseconds_remaining){
+        TimeCountdown timeCountdown = new TimeCountdown();
+        timeCountdown.startNewCountDown(time_show, milliseconds_remaining);
+        return timeCountdown;
+    }
 
 
     @Override
@@ -40,6 +73,25 @@ public class MainActivity extends AppCompatActivity {
 
         addListenerButtons();
         startTimeFieldsDisplay();
+        enabled_inputs = true;
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        Intent intent = new Intent(this, TimingService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        if(mBound){
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     @Override
@@ -54,7 +106,24 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    public void blockInputs(){
+        for(int i = 0; i < time_fields.size(); i++){
+            time_fields.get(i).blockInput();
+        }
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).setVisibility(View.INVISIBLE);
+        enabled_inputs = false;
 
+    }
+    public void enableInputs(){
+        for(int i = 0; i < time_fields.size(); i++){
+            time_fields.get(i).enableInput();
+        }
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).setVisibility(View.VISIBLE);
+        enabled_inputs = true;
+    }
+    public boolean isEnabled_inputs(){
+        return enabled_inputs;
+    }
 
 
     private void startTimeFieldsDisplay(){
@@ -64,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
             et_list.addView(time_fields.get(i).getLayout());
         }
     }
-
-
 
     public void addListenerButtons(){
         buttons = new ArrayList<>();
@@ -108,11 +175,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public ArrayList<Integer> getMinutesList(){
+    public ArrayList<Integer> getMillisecondsList(){
         ArrayList<Integer> out_list = new ArrayList<>();
 
         for(int i = 0; i < time_fields.size(); i++){
-            out_list.add(time_fields.get(i).getMinutes());
+            out_list.add(time_fields.get(i).getMilliseconds());
         }
 
         return out_list;

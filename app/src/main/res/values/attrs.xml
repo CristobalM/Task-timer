@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="extraInformation" format="string"/>
+
+    <declare-styleable name="PieChart">
+        <attr name="showText" format="boolean" />
+        <attr name="labelPosition" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="TimeDescription">
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="extraInformation" />
+    </declare-styleable>
+    <declare-styleable name="TimeCountdownView">
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="extraInformation"/>
+    </declare-styleable>
+    <declare-styleable name="TimeDraggable">
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="extraInformation" />
+    </declare-styleable>
+    <declare-styleable name="TimeLinearLayout"/>
+
+</resources>

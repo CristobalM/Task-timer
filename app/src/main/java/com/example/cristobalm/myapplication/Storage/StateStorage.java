@@ -21,7 +21,7 @@ public final class StateStorage {
     private Context context;
     private static String TIME_FIELDS = "time_fields";
     private static String CUSTOM_TEXT = "custom_text";
-    private static String MINUTES = "minutes";
+    private static String MILLISECONDS = "milliseconds";
     private FileHandling fileHandling;
     private String filename;
     private boolean fileExists;
@@ -53,7 +53,7 @@ public final class StateStorage {
             JSONObject temp_pair = new JSONObject();
             try {
                 temp_pair.put(CUSTOM_TEXT, time_fields.get(i).getCustomText());
-                temp_pair.put(MINUTES, time_fields.get(i).getMinutes());
+                temp_pair.put(MILLISECONDS, time_fields.get(i).getMilliseconds());
                 list_building.put(temp_pair);
             }
             catch(JSONException e){
@@ -73,7 +73,7 @@ public final class StateStorage {
         for(int i = 0; i < receive_data.length(); i++){
             try {
                 JSONObject pair = receive_data.getJSONObject(i);
-                Timefield tfield = new Timefield(context, i, pair.getString(CUSTOM_TEXT), pair.getString(MINUTES));
+                Timefield tfield = new Timefield(context, i, pair.getString(CUSTOM_TEXT), Integer.parseInt(pair.getString(MILLISECONDS)));
                 time_fields.add(tfield);
             }
             catch (JSONException e){
