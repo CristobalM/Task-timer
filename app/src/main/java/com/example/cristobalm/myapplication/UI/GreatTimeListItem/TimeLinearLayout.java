@@ -18,10 +18,10 @@ import com.example.cristobalm.myapplication.R;
 
 public class TimeLinearLayout extends LinearLayout {
 
-    Context context;
-    TimeDescription timeDescription;
-    TimeCountdownView timeCountdownView;
-    TimeDraggable timeDraggable;
+    private Context context;
+    private TimeDescription timeDescription;
+    private TimeCountdownView timeCountdownView;
+    private TimeDraggable timeDraggable;
     AttributeSet attrs;
 
 
@@ -70,22 +70,22 @@ public class TimeLinearLayout extends LinearLayout {
         timeDraggable = new TimeDraggable(context);
         setOrientation(HORIZONTAL);
         int a;
-        timeDescription.setId(R.id.time_description);
+        //timeDescription.setId(R.id.time_description);
         timeDescription.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         timeDescription.setBackgroundColor(ContextCompat.getColor (context, R.color.colorDescription));
         timeDescription.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeDescription.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         timeDescription.setPadding(getPixels(10), getPixels(0), getPixels(10), getPixels(0));
-        timeDescription.setText(R.string.task);
+        //timeDescription.setText(R.string.task);
 
-        timeCountdownView.setId(R.id.time_countdown_view);
+        //timeCountdownView.setId(R.id.time_countdown_view);
         timeCountdownView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountDown));
         timeCountdownView.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeCountdownView.setGravity(Gravity.CENTER);
         setTime(0,0,0);
 
-        timeDraggable.setId(R.id.time_draggable);
+        //timeDraggable.setId(R.id.time_draggable);
         timeDraggable.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorBlack));
 
@@ -107,6 +107,7 @@ public class TimeLinearLayout extends LinearLayout {
     }
 
     public void setDescription(String description){
+        Log.d("tll_setDescription","setting description: "+ description);
         timeDescription.setText(description);
     }
 
@@ -119,6 +120,7 @@ public class TimeLinearLayout extends LinearLayout {
         timeDescription.setFocusableInTouchMode(true);
         timeCountdownView.setFocusableInTouchMode(true);
     }
+
 
 
 }

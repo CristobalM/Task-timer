@@ -62,6 +62,9 @@ public class TimingService extends Service {
     public IBinder onBind(Intent intent){
         current_state = MainStateGlobals.STATE_IDLE;
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if(timingNotifications == null) {
+            timingNotifications = new TimingNotifications(this);
+        }
         return mBinder;
     }
 
@@ -113,7 +116,6 @@ public class TimingService extends Service {
         current_timer_index = 0;
         setMainState(MainStateGlobals.STATE_RUNNING);
 
-        timingNotifications = new TimingNotifications(this);
         notification_id = 0;
         timingNotifications.sendNotification(notification_id, MainActivity.class,
                 "Continuing on iteration #"+current_timer_index+
@@ -161,8 +163,7 @@ public class TimingService extends Service {
 
     private String getTimeString(){
         if(times != null && times.size() > current_timer_index) {
-            TimeContainer time_container = new TimeContainer(times.get(current_timer_index));
-            return time_container.getTimeString();
+            return TimeContainer.getTimeString(times.get(current_timer_index));
         }
         else{
             return "--:--:--";

@@ -25,7 +25,7 @@ class TimeCountdown {
     }
 
     private void createCountDown(){
-        int milliseconds_remaining = mService.getMillisecondsRemaining()+1000;
+        int milliseconds_remaining = mService.getMillisecondsRemaining()+5000;
         progress_millis = milliseconds_remaining;
         this_timer_num = mService.getCurrent_timer_index();
         countDownTimer = new CountDownTimer(milliseconds_remaining, 500) {
@@ -33,15 +33,10 @@ class TimeCountdown {
             public void onTick(long millisUntilFinished) {
                 int now_timer_num = mService.getCurrent_timer_index();
                 if(now_timer_num != this_timer_num){
-                    timefield.setTimeTemp(0);
-                    timefield.getTimeLinearLayout().setTime(0);
-                    timefield.getTimeLinearLayout().setTime(timefield.getMilliseconds());
-                    this.cancel();
                     return;
                 }
                 int to_record = mService.getMillisecondsRemaining();
                 Log.d("onTick", "to_record:"+to_record);
-                timefield.setTimeTemp(to_record);
                 timefield.getTimeLinearLayout().setTime(to_record);
                 progress_millis = to_record;
             }
@@ -62,6 +57,13 @@ class TimeCountdown {
         }
     }
     void startNewCountDown(Timefield timefield, TimingService mService){
+        if(countDownTimer != null){
+            if(this.timefield != null) {
+                this.timefield.getTimeLinearLayout().setTime(this.timefield.getMilliseconds());
+                //this.timefield.setTimeTemp(this.timefield.getMilliseconds());
+            }
+            stopCountDown();
+        }
         setEditFields(timefield);
         this.mService = mService;
         createCountDown();

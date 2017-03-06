@@ -17,9 +17,8 @@ import com.example.cristobalm.myapplication.UI.GreatTimePicker.GreatTimePickerFr
 
 public class Timefield {
     private Context context;
-    private int index;
     private MainActivity main_activity;
-
+    private int index;
 
     private TimeLinearLayout timeLinearLayout;
 
@@ -27,7 +26,7 @@ public class Timefield {
     private TimeContainer temp_time_container;
 
     public void setTimeTemp(int milliseconds){
-     temp_time_container.setMilliseconds(milliseconds);
+        temp_time_container.setMilliseconds(milliseconds);
     }
     public void setTime(TimeContainer t_container){
         time_container.setMilliseconds(t_container.getMilliseconds());
@@ -44,7 +43,6 @@ public class Timefield {
         }
         @Override
         public void onClick(View view){
-            Log.d("CountdownOn..", "Clicked countdown textview!");
             GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
             greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield);
             greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
@@ -53,25 +51,24 @@ public class Timefield {
 
     Timefield(Context context, int index, MainActivity main_activity){
         this.context = context;
-        this.index = index;
+        setIndex(index);
         time_container = new TimeContainer(0);
 
         init();
-        timeLinearLayout.setDescription("Task " + String.valueOf(index+1));
-        timeLinearLayout.setTime(0,0,0);
+        Log.d("Timefield", "constructor.. index:"+ index);
+        this.timeLinearLayout.setDescription("Task " + String.valueOf(index+1));
+        this.timeLinearLayout.setTime(0,0,0);
         startTimefieldView(main_activity);
-
-
-        Log.d("Timefield", "created new time field with index:"+String.valueOf(index));
     }
     public Timefield(Context context, int index, String custom_text, int milliseconds){
-        Log.d("Timefield", "milliseconds:"+milliseconds);
         this.context = context;
-        this.index = index;
+        setIndex(index);
+        Log.d("Timefield", "secondconstructor.. index:"+index);
+
         time_container = new TimeContainer(milliseconds);
         init();
-        timeLinearLayout.setDescription(custom_text);
-        timeLinearLayout.setTime(
+        this.timeLinearLayout.setDescription(custom_text);
+        this.timeLinearLayout.setTime(
                 time_container.getHours(),
                 time_container.getMinutes(),
                 time_container.getSeconds());
@@ -90,7 +87,6 @@ public class Timefield {
 
     }
 
-
     void setIndex(int i){
         this.index = i;
     }
@@ -102,22 +98,11 @@ public class Timefield {
     public String getCustomText(){
         return timeLinearLayout.getDescription();
     }
-    public int getIndex(){
-        return index;
-    }
+
     LinearLayout getLayout(){
         return timeLinearLayout;
     }
 
-    public int getHours(){
-        return time_container.getHours();
-    }
-    public int getMinutes(){
-        return time_container.getMinutes();
-    }
-    public int getSeconds(){
-        return time_container.getSeconds();
-    }
     public int getMilliseconds(){
         return time_container.getMilliseconds();
     }

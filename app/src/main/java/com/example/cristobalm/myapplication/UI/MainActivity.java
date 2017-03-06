@@ -1,6 +1,5 @@
 package com.example.cristobalm.myapplication.UI;
 
-import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
@@ -22,8 +20,6 @@ import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
-import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeCountdownView;
-import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 
 import java.util.ArrayList;
 
@@ -59,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             setCurrentIndex(mService.getCurrent_timer_index());
             if(current_state == MainStateGlobals.STATE_RUNNING){
                 Timefield current_timefield = time_fields.get(getCurrent_index());
-                current_countdown = createTimeCountDown(current_timefield, mService);
+                startTimeCountDown(current_timefield, mService);
             }
         }
     }
@@ -72,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
             mService = binder.getService();
             mService.setActivityInstance(getMyInstance());
             mBound = true;
-            mService.setTimeList(time_fields);
+            if(current_state != MainStateGlobals.STATE_RUNNING) {
+                mService.setTimeList(time_fields);
+            }
             checkForCountdown();
         }
 
@@ -82,11 +80,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public TimeCountdown createTimeCountDown(Timefield timefield,
-                                             TimingService _service){
-        TimeCountdown timeCountdown = new TimeCountdown();
-        timeCountdown.startNewCountDown(timefield, _service);
-        return timeCountdown;
+    public void startTimeCountDown(Timefield timefield,
+                                            TimingService _service){
+
+        current_countdown.startNewCountDown(timefield, _service);
     }
 
 
@@ -112,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         Intent intent = new Intent(this, TimingService.class);
+        current_countdown = new TimeCountdown();
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 

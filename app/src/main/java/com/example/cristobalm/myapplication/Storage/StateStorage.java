@@ -54,6 +54,7 @@ public final class StateStorage {
                 temp_pair.put(CUSTOM_TEXT, time_fields.get(i).getCustomText());
                 temp_pair.put(MILLISECONDS, time_fields.get(i).getMilliseconds());
                 list_building.put(temp_pair);
+                Log.d("storeTimeFieldsList", "storing field with name "+ time_fields.get(i).getCustomText());
             }
             catch(JSONException e){
                 Log.d("storeTimeFieldsList", "can not store element with custom text:" + time_fields.get(i).getCustomText() );
@@ -72,6 +73,7 @@ public final class StateStorage {
         for(int i = 0; i < receive_data.length(); i++){
             try {
                 JSONObject pair = receive_data.getJSONObject(i);
+                Log.d("getTimeFieldsListLoop", "index:"+i+", string:"+pair.getString(CUSTOM_TEXT));
                 Timefield tfield = new Timefield(context, i, pair.getString(CUSTOM_TEXT), Integer.parseInt(pair.getString(MILLISECONDS)));
                 time_fields.add(tfield);
             }
