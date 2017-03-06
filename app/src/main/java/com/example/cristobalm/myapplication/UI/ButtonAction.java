@@ -2,11 +2,8 @@ package com.example.cristobalm.myapplication.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
@@ -22,10 +19,10 @@ import java.util.ArrayList;
 class ButtonAction {
     private String button_name;
     private Context context;
-    private MainActivity caller_instance;
+    private MainActivity main_activity;
     ButtonAction(String button_name, MainActivity caller_instance){
         this.button_name = button_name;
-        this.caller_instance = caller_instance;
+        this.main_activity = caller_instance;
     }
 
     void setContext(Context context){
@@ -51,59 +48,48 @@ class ButtonAction {
         }
     }
     private void onClickButtonStop(){
-        //Toast.makeText(context, "Click on button " + button_name, Toast.LENGTH_SHORT).show();
-        if(caller_instance.getTime_fields().size() <= 0){
+        if(main_activity.getTime_fields().size() <= 0){
             return;
         }
         Intent intent = new Intent(context, TimingService.class);
-        caller_instance.mService.stopTimer();
+        main_activity.mService.stopTimer();
         context.stopService(intent);
-        if(!caller_instance.isEnabled_inputs()) {
-            caller_instance.enableInputs();
+        if(!main_activity.isEnabled_inputs()) {
+            main_activity.enableInputs();
         }
-        if(caller_instance.current_countdown != null) {
-            caller_instance.current_countdown.stopCountDown();
+        if(main_activity.current_countdown != null) {
+            main_activity.current_countdown.stopCountDown();
         }
     }
     private void onClickButtonPlay(){
-        if(caller_instance.getTime_fields().size() <= 0){
+        if(main_activity.getTime_fields().size() <= 0){
             return;
         }
 
-        ArrayList<Integer> millisecondsList = caller_instance.getMillisecondsList();
+        ArrayList<Integer> millisecondsList = main_activity.getMillisecondsList();
         Intent intent = new Intent(context, TimingService.class);
         intent.putIntegerArrayListExtra(InfoNameGlobals.REPEAT_TIME_LIST, millisecondsList);
         intent.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.START_TIMING);
-        if(caller_instance.isEnabled_inputs()) {
-            caller_instance.blockInputs();
+        if(main_activity.isEnabled_inputs()) {
+            main_activity.blockInputs();
         }
         context.startService(intent);
-        caller_instance.mService.startTimer();
-
-        //TextView target_view = (TextView) caller_instance.findViewById(R.id.time_show);
-        //caller_instance.current_countdown = caller_instance.createTimeCountDown(target_view, caller_instance.mService.getMillisecondsRemaining());
-
+        main_activity.mService.startTimer();
     }
     private void onClickButtonPause(){
-        //Toast.makeText(context, "Click on button " + button_name, Toast.LENGTH_SHORT).show();
 
     }
     private void onClickButtonAdd(){
-        //Toast.makeText(context, "Click on button " + button_name, Toast.LENGTH_SHORT).show();
+
+        ArrayList<Timefield> time_fields = main_activity.getTime_fields();
+        LinearLayout et_list = main_activity.getEt_list();
 
 
-        ArrayList<Timefield> time_fields = caller_instance.getTime_fields();
-        LinearLayout et_list = caller_instance.getEt_list();
-
-
-        Timefield time_f_single = new Timefield(context, time_fields.size(), caller_instance);
+        Timefield time_f_single = new Timefield(context, time_fields.size(), main_activity);
 
 
         time_fields.add(time_f_single);
         et_list.addView(time_f_single.getLayout());
-
-
-        //Log.d("ButtonAction","Size of stuff is:" + String.valueOf(edit_texts.size()));
     }
 
 

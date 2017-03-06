@@ -13,21 +13,18 @@ import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayou
  * Created by cristobalm on 3/3/17.
  */
 
-public class TimeCountdown {
+class TimeCountdown {
     Timefield timefield;
     CountDownTimer countDownTimer;
     TimingService mService;
     int progress_millis;
     int this_timer_num;
 
-    public TimeCountdown(){
-
-    }
-    public void setEditFields(Timefield timefield){
+    private void setEditFields(Timefield timefield){
         this.timefield = timefield;
     }
 
-    public void createCountDown(){
+    private void createCountDown(){
         int milliseconds_remaining = mService.getMillisecondsRemaining()+1000;
         progress_millis = milliseconds_remaining;
         this_timer_num = mService.getCurrent_timer_index();
@@ -54,27 +51,20 @@ public class TimeCountdown {
             }
         };
     }
-    public void initCountDown(){
+    private void initCountDown(){
         if(countDownTimer != null){
             countDownTimer.start();
         }
     }
-    public void resumeCountDown(){
-        createCountDown();
-    }
-    public void stopCountDown(){
+    void stopCountDown(){
         if(countDownTimer != null){
             countDownTimer.cancel();
         }
     }
-    public void startNewCountDown(Timefield timefield,
-                                  TimingService mService){
-        Log.d("startNewCountDown", "called");
+    void startNewCountDown(Timefield timefield, TimingService mService){
         setEditFields(timefield);
         this.mService = mService;
         createCountDown();
         initCountDown();
     }
-
-
 }

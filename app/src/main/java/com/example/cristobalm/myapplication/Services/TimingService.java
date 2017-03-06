@@ -87,7 +87,9 @@ public class TimingService extends Service {
     }
     @Override
     public void onDestroy(){
-        //timingNotifications.stopNotification(notification_id);
+        if(timingNotifications != null) {
+            timingNotifications.stopNotification(notification_id);
+        }
         //stopTimer();
         super.onDestroy();
     }
@@ -111,7 +113,6 @@ public class TimingService extends Service {
         current_timer_index = 0;
         setMainState(MainStateGlobals.STATE_RUNNING);
 
-        //notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         timingNotifications = new TimingNotifications(this);
         notification_id = 0;
         timingNotifications.sendNotification(notification_id, MainActivity.class,

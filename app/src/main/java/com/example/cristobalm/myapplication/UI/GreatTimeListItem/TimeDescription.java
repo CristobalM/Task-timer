@@ -58,7 +58,6 @@ public class TimeDescription extends EditText {
         int desiredHeight = 100;
         int height;
 
-        //int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);

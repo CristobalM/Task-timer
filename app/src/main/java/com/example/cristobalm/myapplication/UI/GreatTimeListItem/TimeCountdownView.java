@@ -55,15 +55,19 @@ public class TimeCountdownView extends TextView {
         path_bar = new Path();
     }
 
+    private void drawSeparatorVerticalDashedLine(Canvas canvas){ // To left of the view
+        float start_x = 0;
+        float start_y = 10;
+        float end_y = getMeasuredHeight()-7;
+        path_bar.moveTo(start_x, start_y);
+        path_bar.lineTo(start_x, end_y);
+        canvas.drawPath(path_bar, paint_bar);
+    }
+
+
     @Override
     protected void onDraw(Canvas canvas){
-        float startx = 0;
-        float starty = 10;
-        float endy = getMeasuredHeight()-7;
-        path_bar.moveTo(startx, starty);
-        path_bar.lineTo(startx, endy);
-        canvas.drawPath(path_bar, paint_bar);
-
+        drawSeparatorVerticalDashedLine(canvas);
         super.onDraw(canvas);
     }
 
@@ -71,7 +75,7 @@ public class TimeCountdownView extends TextView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         int desiredHeight = 100;
         int height;
-        //int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -85,7 +89,6 @@ public class TimeCountdownView extends TextView {
         else{
             height = desiredHeight;
         }
-
 
         setMeasuredDimension(widthSize/4, height);
     }

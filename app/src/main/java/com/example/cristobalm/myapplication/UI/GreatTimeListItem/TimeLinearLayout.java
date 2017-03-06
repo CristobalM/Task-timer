@@ -23,12 +23,7 @@ public class TimeLinearLayout extends LinearLayout {
     TimeCountdownView timeCountdownView;
     TimeDraggable timeDraggable;
     AttributeSet attrs;
-    OnClickListener countdownOnClickListener;
-    String descriptionText;
 
-    private int TIME_DESCRIPTION_ID = 0;
-    private int TIME_COUNTDOWN_ID = 1;
-    private int TIME_DRAGGABLE_ID = 2;
 
 
     public void setTime(int hours, int minutes, int seconds){
@@ -87,7 +82,6 @@ public class TimeLinearLayout extends LinearLayout {
         timeCountdownView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountDown));
         timeCountdownView.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
-        //timeCountdownView.setPadding(getPixels(0), getPixels(15), getPixels(0), getPixels(15));
         timeCountdownView.setGravity(Gravity.CENTER);
         setTime(0,0,0);
 
@@ -100,8 +94,6 @@ public class TimeLinearLayout extends LinearLayout {
         this.addView(timeCountdownView);
         this.addView(timeDraggable);
 
-        Log.d("timlinearlayout init", "calling init()!! end of init");
-
     }
 
     @Override
@@ -112,12 +104,10 @@ public class TimeLinearLayout extends LinearLayout {
 
     public void setCountdownListener(OnClickListener listener){
         timeCountdownView.setOnClickListener(listener);
-        //countdownOnClickListener = listener;
     }
 
     public void setDescription(String description){
         timeDescription.setText(description);
-        //descriptionText = description;
     }
 
     public void stopEditables(){

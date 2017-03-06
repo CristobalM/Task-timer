@@ -35,7 +35,6 @@ public final class StateStorage {
 
     private void storeStateIntoJSONFile(String keyname, Object data, int state){
         String current_data = getFileJSONString();
-        Log.d("storeStateIntoJSONFile","current data: "+current_data);
         JSONObject jsonObject;
         try{
             jsonObject = new JSONObject(current_data);
@@ -98,14 +97,12 @@ public final class StateStorage {
     }
     private JSONArray getStateList(String keyname, int state){
         String current_data = getFileJSONString();
-        Log.d("getStateList", "current_data: "+ current_data);
         JSONArray out_data = null;
         String key_to_fetch = keyname + String.valueOf(state);
         try{
             JSONObject jsonObject = new JSONObject(current_data);
             if(jsonObject.has(key_to_fetch)) {
                 out_data = jsonObject.getJSONArray(key_to_fetch);
-                Log.d("getStateList", "got out_data=" + out_data.toString());
             }
             else{
               Log.d("getStateList", "keyname " + key_to_fetch + " not found");

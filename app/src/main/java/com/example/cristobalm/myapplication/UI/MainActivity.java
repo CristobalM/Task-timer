@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
             setCurrentIndex(mService.getCurrent_timer_index());
             if(current_state == MainStateGlobals.STATE_RUNNING){
                 Timefield current_timefield = time_fields.get(getCurrent_index());
-                int millis_remaining = mService.getMillisecondsRemaining();
                 current_countdown = createTimeCountDown(current_timefield, mService);
             }
         }
@@ -85,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
     public TimeCountdown createTimeCountDown(Timefield timefield,
                                              TimingService _service){
-        //Log.d("createTimeCountdown","milliremaining"+milliseconds_remaining);
         TimeCountdown timeCountdown = new TimeCountdown();
         timeCountdown.startNewCountDown(timefield, _service);
         return timeCountdown;
