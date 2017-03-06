@@ -1,10 +1,11 @@
-package com.example.cristobalm.myapplication.Views;
+package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.View;
+import android.widget.EditText;
 
 import com.example.cristobalm.myapplication.R;
 
@@ -12,22 +13,27 @@ import com.example.cristobalm.myapplication.R;
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeDraggable extends View {
-    String text;
-    int text_color;
+public class TimeDescription extends EditText {
+
     AttributeSet attrs;
-    public TimeDraggable(Context context){
+    String text;
+
+    int text_color;
+    public TimeDescription(Context context){
         super(context);
+        init();
     }
-    public TimeDraggable(Context context, AttributeSet attrs, int defStyle){
+    public TimeDescription(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         this.attrs = attrs;
+        init();
+
     }
-    public TimeDraggable(Context context, AttributeSet attrs){
+    public TimeDescription(Context context, AttributeSet attrs){
         super(context, attrs);
         this.attrs = attrs;
+        init();
     }
-
 
     protected void init(){
         text = "Description";
@@ -38,12 +44,20 @@ public class TimeDraggable extends View {
             text = typedArray.getString(R.styleable.TimeDescription_android_text);
             text_color = typedArray.getColor(R.styleable.TimeDescription_android_textColor, Color.BLACK);
         }
+
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas){
+
+        super.onDraw(canvas);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         int desiredHeight = 100;
         int height;
+
         //int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -59,6 +73,7 @@ public class TimeDraggable extends View {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize, height);
+        setMeasuredDimension(widthSize/2, height);
     }
 }
+

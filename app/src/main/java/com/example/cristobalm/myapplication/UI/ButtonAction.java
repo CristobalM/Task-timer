@@ -61,7 +61,9 @@ class ButtonAction {
         if(!caller_instance.isEnabled_inputs()) {
             caller_instance.enableInputs();
         }
-        caller_instance.current_countdown.stopCountDown();
+        if(caller_instance.current_countdown != null) {
+            caller_instance.current_countdown.stopCountDown();
+        }
     }
     private void onClickButtonPlay(){
         if(caller_instance.getTime_fields().size() <= 0){
@@ -77,8 +79,9 @@ class ButtonAction {
         }
         context.startService(intent);
         caller_instance.mService.startTimer();
-        TextView target_view = (TextView) caller_instance.findViewById(R.id.time_show);
-        caller_instance.current_countdown = caller_instance.createTimeCountDown(target_view, caller_instance.mService.getMillisecondsRemaining());
+
+        //TextView target_view = (TextView) caller_instance.findViewById(R.id.time_show);
+        //caller_instance.current_countdown = caller_instance.createTimeCountDown(target_view, caller_instance.mService.getMillisecondsRemaining());
 
     }
     private void onClickButtonPause(){

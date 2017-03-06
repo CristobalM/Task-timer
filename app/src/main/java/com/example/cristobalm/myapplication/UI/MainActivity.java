@@ -1,5 +1,6 @@
 package com.example.cristobalm.myapplication.UI;
 
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,9 @@ import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeCountdownView;
+import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 
 import java.util.ArrayList;
 
@@ -35,14 +39,42 @@ public class MainActivity extends AppCompatActivity {
     TimingService mService;
     TimeCountdown current_countdown;
 
+    public int current_state;
+    private int current_index;
+
+
+    public MainActivity getMyInstance(){
+        return this;
+    }
+    public void setCurrentIndex(int index){
+        current_index = index;
+    }
+    public int getCurrent_index(){
+        return current_index;
+    }
+
+    public void checkForCountdown(){
+        if(mService != null){
+            current_state = mService.getMainState();
+            setCurrentIndex(mService.getCurrent_timer_index());
+            if(current_state == MainStateGlobals.STATE_RUNNING){
+                Timefield current_timefield = time_fields.get(getCurrent_index());
+                int millis_remaining = mService.getMillisecondsRemaining();
+                current_countdown = createTimeCountDown(current_timefield, mService);
+            }
+        }
+    }
+
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             TimingService.LocalBinder binder = (TimingService.LocalBinder) service;
             mService = binder.getService();
+            mService.setActivityInstance(getMyInstance());
             mBound = true;
             mService.setTimeList(time_fields);
+            checkForCountdown();
         }
 
         @Override
@@ -51,10 +83,11 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public TimeCountdown createTimeCountDown(TextView time_show,
-                                             int milliseconds_remaining){
+    public TimeCountdown createTimeCountDown(Timefield timefield,
+                                             TimingService _service){
+        //Log.d("createTimeCountdown","milliremaining"+milliseconds_remaining);
         TimeCountdown timeCountdown = new TimeCountdown();
-        timeCountdown.startNewCountDown(time_show, milliseconds_remaining);
+        timeCountdown.startNewCountDown(timefield, _service);
         return timeCountdown;
     }
 

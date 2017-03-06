@@ -1,34 +1,52 @@
 package com.example.cristobalm.myapplication.UI;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.Services.TimingService;
+import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 
 /**
  * Created by cristobalm on 3/3/17.
  */
 
 public class TimeCountdown {
-    TextView edit_remaining_time;
+    Timefield timefield;
     CountDownTimer countDownTimer;
+    TimingService mService;
     int progress_millis;
+    int this_timer_num;
+
     public TimeCountdown(){
 
     }
-    public void setEditFields(TextView edit_remaining_time){
-        this.edit_remaining_time = edit_remaining_time;
+    public void setEditFields(Timefield timefield){
+        this.timefield = timefield;
     }
 
-    public void createCountDown(int milliseconds_remaining){
+    public void createCountDown(){
+        int milliseconds_remaining = mService.getMillisecondsRemaining()+1000;
         progress_millis = milliseconds_remaining;
-        countDownTimer = new CountDownTimer(milliseconds_remaining, 1000) {
+        this_timer_num = mService.getCurrent_timer_index();
+        countDownTimer = new CountDownTimer(milliseconds_remaining, 500) {
             @Override
             public void onTick(long millisUntilFinished) {
-                TimeContainer timeContainer = new TimeContainer((int) millisUntilFinished);
-                edit_remaining_time.setText(String.valueOf(timeContainer.getTimeString()));
-                progress_millis = (int) millisUntilFinished;
+                int now_timer_num = mService.getCurrent_timer_index();
+                if(now_timer_num != this_timer_num){
+                    timefield.setTimeTemp(0);
+                    timefield.getTimeLinearLayout().setTime(0);
+                    timefield.getTimeLinearLayout().setTime(timefield.getMilliseconds());
+                    this.cancel();
+                    return;
+                }
+                int to_record = mService.getMillisecondsRemaining();
+                Log.d("onTick", "to_record:"+to_record);
+                timefield.setTimeTemp(to_record);
+                timefield.getTimeLinearLayout().setTime(to_record);
+                progress_millis = to_record;
             }
 
             @Override
@@ -42,17 +60,19 @@ public class TimeCountdown {
         }
     }
     public void resumeCountDown(){
-        createCountDown(progress_millis);
+        createCountDown();
     }
     public void stopCountDown(){
         if(countDownTimer != null){
             countDownTimer.cancel();
         }
     }
-    public void startNewCountDown(TextView edit_remaining_time_,
-                                  int milliseconds_remaining){
-        setEditFields(edit_remaining_time_);
-        createCountDown(milliseconds_remaining);
+    public void startNewCountDown(Timefield timefield,
+                                  TimingService mService){
+        Log.d("startNewCountDown", "called");
+        setEditFields(timefield);
+        this.mService = mService;
+        createCountDown();
         initCountDown();
     }
 

@@ -1,5 +1,7 @@
 package com.example.cristobalm.myapplication.ObjectContainer;
 
+import android.util.Log;
+
 /**
  * Created by cristobalm on 3/3/17.
  * TimeContainer container hours minutes seconds
@@ -23,7 +25,11 @@ public class TimeContainer {
     }
 
     private int toMilliseconds(int hours, int minutes, int seconds){
-        return hours*60*60*1000 + minutes*60*1000 + seconds + 1000;
+        return hours*60*60*1000 + minutes*60*1000 + seconds*1000;
+    }
+
+    public void setMilliseconds(int milliseconds){
+        this.milliseconds = milliseconds;
     }
 
     public int getHours(){
@@ -43,10 +49,13 @@ public class TimeContainer {
         return totalSeconds()/60;
     }
     private int totalSeconds(){
-        return  milliseconds/1000;
+        return  (int)(((double)milliseconds)/1000 + 0.5);
     }
 
     //TimeContainer time_container = new TimeContainer(times.get(current_timer_index));
+    public int getMilliseconds(){
+        return milliseconds;
+    }
     public String getTimeString() {
         return String.format("%02d:%02d:%02d", getHours(), getMinutes(), getSeconds());
     }

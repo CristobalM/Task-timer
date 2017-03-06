@@ -1,10 +1,10 @@
-package com.example.cristobalm.myapplication.Views;
+package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.widget.EditText;
+import android.view.View;
 
 import com.example.cristobalm.myapplication.R;
 
@@ -12,18 +12,18 @@ import com.example.cristobalm.myapplication.R;
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeCountdownView extends EditText {
+public class TimeDraggable extends View {
     String text;
     int text_color;
     AttributeSet attrs;
-    public TimeCountdownView(Context context){
+    public TimeDraggable(Context context){
         super(context);
     }
-    public TimeCountdownView(Context context, AttributeSet attrs, int defStyle){
+    public TimeDraggable(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         this.attrs = attrs;
     }
-    public TimeCountdownView(Context context, AttributeSet attrs){
+    public TimeDraggable(Context context, AttributeSet attrs){
         super(context, attrs);
         this.attrs = attrs;
     }
@@ -59,7 +59,6 @@ public class TimeCountdownView extends EditText {
             height = desiredHeight;
         }
 
-
-        setMeasuredDimension(widthSize/2, height);
+        setMeasuredDimension(widthSize/4, height);
     }
 }
