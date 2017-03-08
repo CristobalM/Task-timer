@@ -90,6 +90,6 @@ public class TimeCountdownView extends TextView {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize/4, height);
+        setMeasuredDimension((int) ((double)widthSize/1.5), height);
     }
 }

@@ -86,9 +86,11 @@ class ButtonAction {
 
 
         Timefield time_f_single = new Timefield(context, time_fields.size(), main_activity);
-
-
         time_fields.add(time_f_single);
+
+        int static_index = main_activity.map_timefields.size();
+
+        main_activity.map_timefields.put(static_index,time_f_single);
         et_list.addView(time_f_single.getLayout());
     }
 

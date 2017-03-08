@@ -59,6 +59,6 @@ public class TimeDraggable extends View {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize/4, height);
+        setMeasuredDimension(widthSize, height);
     }
 }

@@ -1,13 +1,20 @@
 package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
+import android.text.method.KeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
@@ -16,7 +23,7 @@ import com.example.cristobalm.myapplication.R;
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeLinearLayout extends LinearLayout {
+public class TimeLinearLayout extends RelativeLayout {
 
     private Context context;
     private TimeDescription timeDescription;
@@ -24,6 +31,14 @@ public class TimeLinearLayout extends LinearLayout {
     private TimeDraggable timeDraggable;
     AttributeSet attrs;
 
+    LinearLayout items_container;
+
+    private ImageView imageView;
+    boolean toggled;
+
+    KeyListener descriptionKeyListener;
+
+    private int position;
 
 
     public void setTime(int hours, int minutes, int seconds){
@@ -65,12 +80,17 @@ public class TimeLinearLayout extends LinearLayout {
     }
 
     private void init(){
+        items_container = new LinearLayout(context);
         timeDescription = new TimeDescription(context);
         timeCountdownView = new TimeCountdownView(context);
         timeDraggable = new TimeDraggable(context);
-        setOrientation(HORIZONTAL);
-        int a;
+        imageView = new ImageView(context);
+
+
         //timeDescription.setId(R.id.time_description);
+        items_container.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        items_container.setOrientation(LinearLayout.HORIZONTAL);
+
         timeDescription.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         timeDescription.setBackgroundColor(ContextCompat.getColor (context, R.color.colorDescription));
         timeDescription.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
@@ -90,9 +110,26 @@ public class TimeLinearLayout extends LinearLayout {
         timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorBlack));
 
 
-        this.addView(timeDescription);
-        this.addView(timeCountdownView);
-        this.addView(timeDraggable);
+        items_container.addView(timeDescription);
+        items_container.addView(timeCountdownView);
+        items_container.addView(timeDraggable);
+
+
+        this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
+        this.addView(items_container);
+
+        this.invalidate();
+
+        imageView.setLayoutParams(new LayoutParams(200, 200));
+        imageView.setBackgroundColor(Color.GRAY);
+        imageView.setColorFilter(Color.RED);
+        toggled = false;
+
+        descriptionKeyListener = timeDescription.getKeyListener();
+
+        position = -1;
+
 
     }
 
@@ -119,6 +156,56 @@ public class TimeLinearLayout extends LinearLayout {
     public void enableEditables(){
         timeDescription.setFocusableInTouchMode(true);
         timeCountdownView.setFocusableInTouchMode(true);
+    }
+
+    public void setDraggableClickListener(OnTouchListener onLongClickListener){
+        timeDraggable.setOnTouchListener(onLongClickListener);
+    }
+
+    public TimeDraggable getTimeDraggable(){
+        return timeDraggable;
+    }
+    public TimeDescription getTimeDescription(){
+        return timeDescription;
+    }
+    public TimeCountdownView getTimeCountdownView(){
+        return timeCountdownView;
+    }
+
+    public void changeBackgroundColor(int color){
+        timeDescription.setBackgroundColor(color);
+    }
+
+    public void toggleDragInHover(){
+        if(!toggled) {
+            this.addView(imageView);
+        }
+        timeDescription.setFocusable(false);
+        timeDescription.setKeyListener(null);
+        toggled = true;
+    }
+    public void toggleDragOutHover(){
+        if(toggled) {
+            this.removeView(imageView);
+            toggled = false;
+        }
+        timeDescription.setFocusableInTouchMode(true);
+        timeDescription.setKeyListener(descriptionKeyListener);
+
+    }
+    public void restoreNotDragState(){
+        if(toggled){
+            this.removeView(imageView);
+            toggled = false;
+        }
+        timeDescription.setFocusableInTouchMode(true);
+    }
+
+    public void setPosition(int pos){
+        position = pos;
+    }
+    public int getPosition(){
+        return position;
     }
 
 

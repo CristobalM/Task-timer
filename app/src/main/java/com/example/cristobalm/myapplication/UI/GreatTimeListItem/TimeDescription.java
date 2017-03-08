@@ -1,10 +1,15 @@
 package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
+import android.content.ClipDescription;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.view.ActionMode;
+import android.view.DragEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.example.cristobalm.myapplication.R;
@@ -19,6 +24,8 @@ public class TimeDescription extends EditText {
     String text;
 
     int text_color;
+
+
     public TimeDescription(Context context){
         super(context);
         init();
@@ -44,7 +51,6 @@ public class TimeDescription extends EditText {
             text = typedArray.getString(R.styleable.TimeDescription_android_text);
             text_color = typedArray.getColor(R.styleable.TimeDescription_android_textColor, Color.BLACK);
         }
-
     }
 
     @Override
@@ -72,7 +78,22 @@ public class TimeDescription extends EditText {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize/2, height);
+        setMeasuredDimension(widthSize*2/3, height);
     }
+
+    @Override
+    public boolean onDragEvent(DragEvent event){
+        switch (event.getAction()){
+            case DragEvent.ACTION_DRAG_STARTED:
+                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)){
+                    return true;
+                }
+                return false;
+            default:
+                return super.onDragEvent(event);
+        }
+    }
+
+
 }
 

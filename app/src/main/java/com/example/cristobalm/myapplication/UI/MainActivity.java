@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
@@ -20,14 +21,18 @@ import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
+import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 
 public class MainActivity extends AppCompatActivity {
     public static final String ET_LIST = "et_list";
     ArrayList<Button> buttons;
     ArrayList<Timefield> time_fields;
+    Hashtable<Integer, Timefield> map_timefields;
     LinearLayout et_list;
     StateStorage stateStorage;
     boolean enabled_inputs;
@@ -38,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     public int current_state;
     private int current_index;
 
+    ThrashCan thrashCan;
+
+    public int unique_index;
 
     public MainActivity getMyInstance(){
         return this;
@@ -49,6 +57,37 @@ public class MainActivity extends AppCompatActivity {
         return current_index;
     }
 
+    public void moveTimefield(int static_dest, int static_source){
+        Timefield source = map_timefields.get(static_source);
+        Timefield dest = map_timefields.get(static_dest);
+        if(static_source > -1 && time_fields != null && source != null && dest != null &&
+                time_fields.size() > source.getIndex() &&
+                time_fields.size() > dest.getIndex()
+                ){
+            time_fields.add(dest.getIndex(),
+                    time_fields.remove(source.getIndex()));
+            reloadList();
+        }else{
+            Toast.makeText(getApplicationContext(), "Some error occurred during dragging operation", Toast.LENGTH_LONG).show();
+        }
+    }
+    public void removeTimeField(int static_which){
+        Log.d("removeTimeField", "Trying to delete Timefield with static index: "+ static_which);
+        Timefield target = map_timefields.get(static_which);
+        if(static_which > -1 && target != null && time_fields.size()>0 && time_fields.size() > target.getIndex()) {
+            time_fields.remove(target.getIndex());
+            reloadList();
+        }
+        else{
+            Log.e("removeTimeField",
+                    "static_index " + static_which +
+                            " not found. target==null?:"+ String.valueOf(target==null) +
+                            " time_fields.size():"+ time_fields.size() +
+                            " target.getIndex: " + String.valueOf((target != null ? target.getIndex() : "ES NULO"))
+            );
+        }
+    }
+
     public void checkForCountdown(){
         if(mService != null){
             current_state = mService.getMainState();
@@ -58,6 +97,14 @@ public class MainActivity extends AppCompatActivity {
                 startTimeCountDown(current_timefield, mService);
             }
         }
+    }
+    public void showThrashCan(){
+        thrashCan.setVisibility(View.VISIBLE);
+        thrashCan.invalidate();
+    }
+    public void hideThrashCan(){
+        thrashCan.setVisibility(View.INVISIBLE);
+        thrashCan.invalidate();
     }
 
 
@@ -86,14 +133,24 @@ public class MainActivity extends AppCompatActivity {
         current_countdown.startNewCountDown(timefield, _service);
     }
 
+    public Hashtable<Integer, Timefield> copyTimefieldList(ArrayList<Timefield> src){
+        Hashtable<Integer, Timefield> hashtable = new Hashtable<Integer, Timefield>();
+        for(int i = 0; i < src.size(); i++){
+            hashtable.put(src.get(i).getIndex(), src.get(i));
+        }
+        return hashtable;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        unique_index = 0;
         setContentView(R.layout.activity_main);
 
         stateStorage = new StateStorage(getApplicationContext(), FilenameGlobals.STORED_STATES);
         time_fields = stateStorage.getTimeFieldsList(StateGlobals.SAVE_STATE);
+        map_timefields = copyTimefieldList(time_fields);
 
         int et_listID = getResources().getIdentifier(ET_LIST, "id", getPackageName());
         et_list = (LinearLayout) findViewById(et_listID);
@@ -102,6 +159,10 @@ public class MainActivity extends AppCompatActivity {
         addListenerButtons();
         startTimeFieldsDisplay();
         enabled_inputs = true;
+
+        thrashCan = (ThrashCan)findViewById(R.id.thrash_can);
+        thrashCan.setOnDragListener(new ThrashOnDragListener(this, thrashCan));
+        thrashCan.setVisibility(View.INVISIBLE);
     }
 
     @Override
