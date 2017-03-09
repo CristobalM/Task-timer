@@ -18,12 +18,13 @@ import android.widget.RelativeLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeLinearLayout extends RelativeLayout {
+public class TimeLinearLayout extends LinearLayout {
 
     private Context context;
     private TimeDescription timeDescription;
@@ -40,6 +41,7 @@ public class TimeLinearLayout extends RelativeLayout {
 
     private int position;
 
+    private float scale;
 
     public void setTime(int hours, int minutes, int seconds){
         TimeContainer timeContainer = new TimeContainer(hours, minutes, seconds);
@@ -74,12 +76,9 @@ public class TimeLinearLayout extends RelativeLayout {
         this.attrs = attrs;
         init();
     }
-    private int getPixels(int dp){
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        return (int)(dp*scale + 0.5f);
-    }
 
     private void init(){
+        scale=  getResources().getDisplayMetrics().density;
         items_container = new LinearLayout(context);
         timeDescription = new TimeDescription(context);
         timeCountdownView = new TimeCountdownView(context);
@@ -87,37 +86,71 @@ public class TimeLinearLayout extends RelativeLayout {
         imageView = new ImageView(context);
 
 
-        //timeDescription.setId(R.id.time_description);
-        items_container.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         items_container.setOrientation(LinearLayout.HORIZONTAL);
 
-        timeDescription.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        timeDescription.setBackgroundColor(ContextCompat.getColor (context, R.color.colorDescription));
-        timeDescription.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
-        timeDescription.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        timeDescription.setPadding(getPixels(10), getPixels(0), getPixels(10), getPixels(0));
-        //timeDescription.setText(R.string.task);
 
-        //timeCountdownView.setId(R.id.time_countdown_view);
-        timeCountdownView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountDown));
+        timeDraggable.setId(R.id.time_draggable);
+        int draggable_width = VisualSettingGlobals.getPixels(50, scale);
+        timeDraggable.setLayoutParams(new LayoutParams(draggable_width, LayoutParams.MATCH_PARENT));
+        timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDraggable));
+
+
+
+        timeCountdownView.setId(R.id.time_countdown_view);
+        int countdown_width = VisualSettingGlobals.getPixels(100, scale);
+        timeCountdownView.setLayoutParams(new LayoutParams(countdown_width, LayoutParams.MATCH_PARENT));
+        timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackground));
         timeCountdownView.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeCountdownView.setGravity(Gravity.CENTER);
+
+
+        timeDescription.setId(R.id.time_description);
+        timeDescription.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        timeDescription.setBackgroundColor(ContextCompat.getColor (context, R.color.colorDescriptionBackground));
+        timeDescription.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
+        timeDescription.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        timeDescription.setPadding(VisualSettingGlobals.getPixels(10,scale),
+                VisualSettingGlobals.getPixels(0, scale),
+                VisualSettingGlobals.getPixels(10,scale),
+                VisualSettingGlobals.getPixels(0,scale));
+        //timeDescription.setText(R.string.task);
+
+
         setTime(0,0,0);
 
-        //timeDraggable.setId(R.id.time_draggable);
-        timeDraggable.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorBlack));
 
-
+        items_container.addView(timeDraggable);
         items_container.addView(timeDescription);
         items_container.addView(timeCountdownView);
-        items_container.addView(timeDraggable);
+
+        items_container.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
+        //RelativeLayout.LayoutParams draggable_params = (RelativeLayout.LayoutParams) timeDraggable.getLayoutParams();
+        //RelativeLayout.LayoutParams description_params = (RelativeLayout.LayoutParams) timeDescription.getLayoutParams();
+        //RelativeLayout.LayoutParams countdown_params = (RelativeLayout.LayoutParams) timeCountdownView.getLayoutParams();
+
+        //draggable_params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        //timeDraggable.setLayoutParams(draggable_params);
+
+        //description_params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        //description_params.addRule(RelativeLayout.RIGHT_OF, R.id.time_draggable);
+        //timeDescription.setLayoutParams(description_params);
+
+        //countdown_params.addRule(RelativeLayout.RIGHT_OF, R.id.time_description);
+        //timeCountdownView.setLayoutParams(countdown_params);
 
 
-        this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         this.addView(items_container);
+
+
+        LinearLayout.LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        //int top_margin = VisualSettingGlobals.getPixels(5, scale);
+        int bottom_margin = VisualSettingGlobals.getPixels(1, scale);
+        params.setMargins(0,0,0,bottom_margin);
+
+
+        this.setLayoutParams(params);
 
         this.invalidate();
 

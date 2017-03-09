@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -25,7 +26,7 @@ import com.example.cristobalm.myapplication.UI.Timefield;
  * Created by cristobalm on 3/7/17.
  */
 
-public class ThrashCan extends ImageView {
+public class ThrashCan extends AppCompatImageView {
 
     AttributeSet attrs;
 
@@ -52,10 +53,10 @@ public class ThrashCan extends ImageView {
         //setImageDrawable(getResources().getDrawable(R.drawable.ic_delete_black_24px, 0));
         Drawable drawable;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-           drawable = getResources().getDrawable(R.drawable.ic_delete_black_24px, null);
+           drawable = getResources().getDrawable(R.drawable.ic_thrashcan, null);
         }
         else{
-            drawable =  getResources().getDrawable(R.drawable.ic_delete_black_24px);
+            drawable =  getResources().getDrawable(R.drawable.ic_thrashcan);
         }
         setImageDrawable(drawable);
     }

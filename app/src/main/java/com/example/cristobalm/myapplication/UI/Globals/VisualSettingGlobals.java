@@ -8,4 +8,9 @@ package com.example.cristobalm.myapplication.UI.Globals;
 public class VisualSettingGlobals {
     public static final int ORIENTATION_UP = 1;
     public static final int ORIENTATION_DOWN = 0;
+
+
+    public static int getPixels(int dps, float scale){
+        return (int) (dps * scale + 0.5f);
+    }
 }

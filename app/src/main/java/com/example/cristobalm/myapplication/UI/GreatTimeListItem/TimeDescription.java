@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.ActionMode;
 import android.view.DragEvent;
@@ -13,17 +14,17 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeDescription extends EditText {
+public class TimeDescription extends AppCompatEditText {
 
     AttributeSet attrs;
-    String text;
 
-    int text_color;
+    private float scale;
 
 
     public TimeDescription(Context context){
@@ -43,14 +44,7 @@ public class TimeDescription extends EditText {
     }
 
     protected void init(){
-        text = "Description";
-        text_color = Color.BLACK;
 
-        if(attrs != null){
-            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.TimeDescription);
-            text = typedArray.getString(R.styleable.TimeDescription_android_text);
-            text_color = typedArray.getColor(R.styleable.TimeDescription_android_textColor, Color.BLACK);
-        }
     }
 
     @Override
@@ -61,7 +55,8 @@ public class TimeDescription extends EditText {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-        int desiredHeight = 100;
+        scale = getResources().getDisplayMetrics().density;
+        int desiredHeight = VisualSettingGlobals.getPixels(50, scale) ;
         int height;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -78,7 +73,7 @@ public class TimeDescription extends EditText {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize*2/3, height);
+        setMeasuredDimension(widthSize - VisualSettingGlobals.getPixels(100,scale), height);
     }
 
     @Override

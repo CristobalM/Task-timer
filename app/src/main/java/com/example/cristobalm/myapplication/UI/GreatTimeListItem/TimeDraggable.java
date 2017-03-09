@@ -7,44 +7,45 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
  * Created by cristobalm on 3/4/17.
  */
 
 public class TimeDraggable extends View {
-    String text;
-    int text_color;
     AttributeSet attrs;
+    float scale;
     public TimeDraggable(Context context){
         super(context);
+        init();
     }
     public TimeDraggable(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         this.attrs = attrs;
+        init();
     }
     public TimeDraggable(Context context, AttributeSet attrs){
         super(context, attrs);
         this.attrs = attrs;
+        init();
     }
 
 
     protected void init(){
-        text = "Description";
-        text_color = Color.BLACK;
-
-        if(attrs != null){
-            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.TimeDescription);
-            text = typedArray.getString(R.styleable.TimeDescription_android_text);
-            text_color = typedArray.getColor(R.styleable.TimeDescription_android_textColor, Color.BLACK);
-        }
+        //scale = getResources().getDisplayMetrics().density;
     }
 
+    /*
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-        int desiredHeight = 100;
+        scale = getResources().getDisplayMetrics().density;
+        int desiredHeight = VisualSettingGlobals.getPixels(50, scale);
+        int desiredWidth = desiredHeight;
         int height;
+        int width;
 
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -59,6 +60,17 @@ public class TimeDraggable extends View {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize, height);
+        if(widthMode == MeasureSpec.EXACTLY){
+            width = desiredWidth;
+        }
+        else if(widthMode ==  MeasureSpec.AT_MOST){
+            width = Math.min(desiredWidth, widthSize);
+        }
+        else{
+            width = desiredWidth;
+        }
+
+        setMeasuredDimension(width, height);
     }
+    */
 }

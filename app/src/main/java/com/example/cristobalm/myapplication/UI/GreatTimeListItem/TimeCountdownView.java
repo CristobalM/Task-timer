@@ -7,22 +7,22 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeCountdownView extends TextView {
-    String text;
-    int text_color;
+public class TimeCountdownView extends AppCompatTextView {
+
     AttributeSet attrs;
 
-    Paint paint_bar = new Paint();
-    Path path_bar;
+
 
     public TimeCountdownView(Context context){
         super(context);
@@ -42,40 +42,25 @@ public class TimeCountdownView extends TextView {
 
 
     protected void init(){
-        text = "Description";
-        text_color = Color.BLACK;
-        if(attrs != null){
-            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.TimeDescription);
-            text = typedArray.getString(R.styleable.TimeDescription_android_text);
-            text_color = typedArray.getColor(R.styleable.TimeDescription_android_textColor, Color.BLACK);
-        }
-        paint_bar.setARGB(250, 180, 180, 180);
-        paint_bar.setStyle(Paint.Style.STROKE);
-        paint_bar.setPathEffect(new DashPathEffect(new float[] {1, 5}, 0));
-        path_bar = new Path();
     }
 
-    private void drawSeparatorVerticalDashedLine(Canvas canvas){ // To left of the view
-        float start_x = 0;
-        float start_y = 10;
-        float end_y = getMeasuredHeight()-7;
-        path_bar.moveTo(start_x, start_y);
-        path_bar.lineTo(start_x, end_y);
-        canvas.drawPath(path_bar, paint_bar);
-    }
 
 
     @Override
     protected void onDraw(Canvas canvas){
-        drawSeparatorVerticalDashedLine(canvas);
         super.onDraw(canvas);
     }
 
+    /*
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-        int desiredHeight = 100;
+        scale = getResources().getDisplayMetrics().density;
+        int desiredHeight = VisualSettingGlobals.getPixels(50, scale);
+        int desiredWidth =  VisualSettingGlobals.getPixels(150, scale);
         int height;
+        int width;
 
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -90,6 +75,17 @@ public class TimeCountdownView extends TextView {
             height = desiredHeight;
         }
 
-        setMeasuredDimension((int) ((double)widthSize/1.5), height);
+        if(widthMode == MeasureSpec.EXACTLY){
+            width = desiredWidth;
+        }
+        else if(widthMode ==  MeasureSpec.AT_MOST){
+            width = Math.min(desiredWidth, widthSize);
+        }
+        else{
+            width = desiredWidth;
+        }
+
+        setMeasuredDimension(width, height);
     }
+    */
 }

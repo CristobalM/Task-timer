@@ -47,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
     public int unique_index;
 
+    //public final float scale = getResources().getDisplayMetrics().density;
+
+
+
     public MainActivity getMyInstance(){
         return this;
     }

@@ -4,8 +4,11 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragOnClickListener;
+import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTOnDragListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 import com.example.cristobalm.myapplication.UI.GreatTimePicker.GreatTimePickerFragment;
 
@@ -19,6 +22,7 @@ public class Timefield {
     private Context context;
     private MainActivity main_activity;
     private int index;
+    private int static_index;
 
     private TimeLinearLayout timeLinearLayout;
 
@@ -77,6 +81,12 @@ public class Timefield {
 
     void startTimefieldView(MainActivity activity){
         main_activity = activity;
+        static_index = main_activity.unique_index;
+        main_activity.unique_index++;
+
+        timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout.getTimeDraggable(), main_activity));
+        timeLinearLayout.setOnDragListener(new GTOnDragListener(timeLinearLayout, main_activity, this));
+
 
     }
 
@@ -84,11 +94,16 @@ public class Timefield {
         timeLinearLayout = new TimeLinearLayout(context);
         timeLinearLayout.setCountdownListener(new CountdownOnClickListener(time_container, timeLinearLayout, this));
         temp_time_container = new TimeContainer(time_container.getMilliseconds());
+        timeLinearLayout.setPosition(index);
+
 
     }
 
-    void setIndex(int i){
+    public void setIndex(int i){
         this.index = i;
+        if(timeLinearLayout != null){
+            timeLinearLayout.setPosition(index);
+        }
     }
 
     public TimeLinearLayout getTimeLinearLayout(){
@@ -103,6 +118,10 @@ public class Timefield {
         return timeLinearLayout;
     }
 
+    public int getIndex(){
+        return index;
+    }
+
     public int getMilliseconds(){
         return time_container.getMilliseconds();
     }
@@ -111,5 +130,12 @@ public class Timefield {
     }
     public void enableInput(){
         timeLinearLayout.enableEditables();
+    }
+
+    public void setStaticIndex(int id){
+        this.static_index = id;
+    }
+    public int getStatic_index(){
+        return static_index;
     }
 }
