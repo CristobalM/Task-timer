@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Great Timer</string>
+    <string name="app_name">Task Timer</string>
     <string name="minutes_list_">mins</string>
     <string name="config_file">config.json</string>
     <string name="ok">Ok</string>

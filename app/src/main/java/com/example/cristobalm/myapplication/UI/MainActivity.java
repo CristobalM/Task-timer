@@ -1,9 +1,11 @@
 package com.example.cristobalm.myapplication.UI;
 
+import android.app.ActionBar;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
-
-    //public final float scale = getResources().getDisplayMetrics().density;
 
 
 
@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         thrashCan = (ThrashCan)findViewById(R.id.thrash_can);
         thrashCan.setOnDragListener(new ThrashOnDragListener(this, thrashCan));
         thrashCan.setVisibility(View.INVISIBLE);
+
     }
 
     @Override

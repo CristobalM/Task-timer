@@ -35,7 +35,7 @@ public class GTOnDragListener implements View.OnDragListener {
         switch (action){
             case DragEvent.ACTION_DRAG_STARTED:
                 if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT)) {
-                    Log.d("ACTION_DRAG_STARTED", "I am " + timeLinearLayout.getDescription() + " receiving call!");
+                    //Log.d("ACTION_DRAG_STARTED", "I am " + timeLinearLayout.getDescription() + " receiving call!");
                     v.invalidate();
                     return true;
                 }
@@ -54,7 +54,7 @@ public class GTOnDragListener implements View.OnDragListener {
                 ClipData.Item item = event.getClipData().getItemAt(0);
                 Intent intent = item.getIntent();
                 int result = intent.getIntExtra(GTDragOnClickListener.SOURCE_INDEX, -1);
-                Toast.makeText(v.getContext(), "Source index is: " + result, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(v.getContext(), "Source index is: " + result, Toast.LENGTH_SHORT).show();
                 timeLinearLayout.restoreNotDragState();
                 mainActivity.moveTimefield(timefield.getStatic_index(), result);
                 v.invalidate();
@@ -64,10 +64,10 @@ public class GTOnDragListener implements View.OnDragListener {
                 timeLinearLayout.restoreNotDragState();
 
                 if(event.getResult()){
-                    Toast.makeText(v.getContext(), "The drop was handled.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(v.getContext(), "The drop was handled.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(v.getContext(), "The drop didn't work", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(v.getContext(), "The drop didn't work", Toast.LENGTH_SHORT).show();
                 }
                 v.invalidate();
                 return true;

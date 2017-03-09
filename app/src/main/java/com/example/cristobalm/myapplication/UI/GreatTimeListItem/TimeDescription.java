@@ -44,7 +44,7 @@ public class TimeDescription extends AppCompatEditText {
     }
 
     protected void init(){
-
+        setFocusableInTouchMode(true);
     }
 
     @Override

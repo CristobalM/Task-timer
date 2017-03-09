@@ -2,6 +2,7 @@ package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
 import android.text.method.KeyListener;
@@ -85,27 +86,33 @@ public class TimeLinearLayout extends LinearLayout {
         timeDraggable = new TimeDraggable(context);
         imageView = new ImageView(context);
 
+        Typeface retrieveFont = VisualSettingGlobals.FontCache.get(VisualSettingGlobals.TEXT_FONT, context);
+
+
 
         items_container.setOrientation(LinearLayout.HORIZONTAL);
 
 
-        timeDraggable.setId(R.id.time_draggable);
+        //timeDraggable.setId(R.id.time_draggable); // DON'T EVER DO THIS
         int draggable_width = VisualSettingGlobals.getPixels(50, scale);
         timeDraggable.setLayoutParams(new LayoutParams(draggable_width, LayoutParams.MATCH_PARENT));
         timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDraggable));
 
 
 
-        timeCountdownView.setId(R.id.time_countdown_view);
+        //timeCountdownView.setId(R.id.time_countdown_view);// DON'T EVER DO THIS
         int countdown_width = VisualSettingGlobals.getPixels(100, scale);
         timeCountdownView.setLayoutParams(new LayoutParams(countdown_width, LayoutParams.MATCH_PARENT));
         timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackground));
         timeCountdownView.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeCountdownView.setGravity(Gravity.CENTER);
+        if(retrieveFont != null) {
+            timeCountdownView.setTypeface(retrieveFont);
+        }
 
-
-        timeDescription.setId(R.id.time_description);
-        timeDescription.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        //timeDescription.setId(R.id.time_description);// DON'T EVER DO THIS
+        LayoutParams description_params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        timeDescription.setLayoutParams(description_params);
         timeDescription.setBackgroundColor(ContextCompat.getColor (context, R.color.colorDescriptionBackground));
         timeDescription.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeDescription.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
@@ -113,7 +120,10 @@ public class TimeLinearLayout extends LinearLayout {
                 VisualSettingGlobals.getPixels(0, scale),
                 VisualSettingGlobals.getPixels(10,scale),
                 VisualSettingGlobals.getPixels(0,scale));
-        //timeDescription.setText(R.string.task);
+        timeDescription.setGravity(Gravity.CENTER_VERTICAL);
+        if(retrieveFont != null) {
+            timeCountdownView.setTypeface(retrieveFont);
+        }
 
 
         setTime(0,0,0);
