@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
+
 
     public void pauseTimer(){
         if(mService == null){
@@ -310,6 +312,9 @@ public class MainActivity extends AppCompatActivity {
             et_list.addView(time_fields.get(i).getLayout());
             time_fields.get(i).setIndex(i);
             time_fields.get(i).restoreTime();
+            //time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().getBackground().clearColorFilter();
+            time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(mService, R.color.colorCountdownBackground));
+            time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().invalidate();
         }
     }
 

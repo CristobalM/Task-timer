@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
 import org.json.JSONArray;
@@ -114,5 +115,36 @@ public final class StateStorage {
             Log.e("getStateList", "Can not parse json data");
         }
         return out_data;
+    }
+
+    public boolean getRepeatState(){
+        String current_data = getFileJSONString();
+        boolean out = false;
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            if(jsonObject.has(StateGlobals.REPEAT_STATE)){
+                String state =  jsonObject.getString(StateGlobals.REPEAT_STATE);
+                if(state.equals("true")){
+                    out = true;
+                }
+            }
+        }
+        catch (JSONException e){
+            Log.e("getRepeatState", "not found repeat state: " + e.getMessage() );
+        }
+        return out;
+    }
+    public void saveRepeatState(boolean state){
+        String current_data = getFileJSONString();
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            jsonObject.put(StateGlobals.REPEAT_STATE, state);
+            String storing_json_data = jsonObject.toString();
+            fileHandling.writeToFile(filename, storing_json_data);
+        }
+        catch(JSONException e){
+            Log.e("getRepeatState", "not found repeat state: " + e.getMessage() );
+        }
+
     }
 }

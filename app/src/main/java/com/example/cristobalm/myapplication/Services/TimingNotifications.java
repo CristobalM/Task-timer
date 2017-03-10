@@ -36,7 +36,7 @@ public class TimingNotifications {
                 .setContentTitle("Task Timing")
                 .setContentText(text_notif)
                 .setPriority(priority)
-                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
+                //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setLights(Color.RED, 3000, 3000);
 
         Intent targetIntent = new Intent(context, target_activity_class);
@@ -48,7 +48,7 @@ public class TimingNotifications {
 
     public void sendNotification(int nID, Class target_activity_class, String text_notif, int notification_sound, int priority){
         Notification notification = createNotification(target_activity_class, text_notif, priority);
-        notification.defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE;
+        notification.defaults = Notification.DEFAULT_LIGHTS;
 
         if(notification_sound > -1) {
             notification.sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + notification_sound);

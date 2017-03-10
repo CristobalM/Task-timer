@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,6 +52,11 @@ class ButtonAction {
                     button.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
                 }
                 break;
+            case ButtonNameGlobals.BUTTON_REPEAT:
+                if(main_activity.mService.getRepeatState()){
+                    button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+                }
+                break;
         }
 
 
@@ -75,6 +81,9 @@ class ButtonAction {
                 break;
             case ButtonNameGlobals.BUTTON_ADD:
                 onClickButtonAdd();
+                break;
+            case ButtonNameGlobals.BUTTON_REPEAT:
+                onClickButtonRepeat();
                 break;
         }
     }
@@ -181,6 +190,20 @@ class ButtonAction {
         scrollView.fullScroll(scrollView.FOCUS_DOWN);
 
     }
+    private void onClickButtonRepeat(){
+        if(main_activity.mService == null){
+            return;
+        }
+        boolean repeat = main_activity.mService.getRepeatState();
+        if(repeat){
+            button.getBackground().clearColorFilter();
+        }else{
+            button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+        }
+        main_activity.mService.saveRepeatState(!repeat);
+        Log.d("onClickButtonRepeat", "saved repeat state:"+!repeat);
+    }
+
 
 
 

@@ -7,4 +7,8 @@ package com.example.cristobalm.myapplication.Storage.Globals;
 
 public class StateGlobals {
     public static final int SAVE_STATE = 0;
+
+
+    // repeat state
+    public static final String REPEAT_STATE = "repeatState";
 }

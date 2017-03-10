@@ -39,7 +39,10 @@ public class TimingService extends Service {
     private long nextMillis = 0;
     private MainActivity main_activity;
     StateStorage stateStorage;
+    StateStorage configStates;
     ServiceCountdown serviceCountdown;
+
+    private Boolean repeatState;
 
     private long last_remaining_millis;
 
@@ -59,12 +62,31 @@ public class TimingService extends Service {
         }
         return stateStorage;
     }
+    public StateStorage getConfigStates(){
+        if(configStates == null) {
+            configStates = new StateStorage(getApplicationContext(), FilenameGlobals.CONFIG_STATES);
+        }
+        return configStates;
+    }
 
     public ArrayList<Timefield> retrieveTimefields(){
         if(time_fields == null) {
             time_fields = getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
         }
         return time_fields;
+    }
+
+    public boolean getRepeatState(){
+        if(repeatState==null){
+            repeatState = getConfigStates().getRepeatState();
+        }
+        return repeatState;
+    }
+    public void saveRepeatState(boolean _repeatState){
+        repeatState = _repeatState;
+    }
+    public void saveRepeatState(){
+        getConfigStates().saveRepeatState(repeatState);
     }
 
 
@@ -137,6 +159,7 @@ public class TimingService extends Service {
             timingNotifications.stopNotification(notification_id);
         }
         //stopTimer();
+        saveRepeatState();
         Log.d("onDestroy", "destroyed service!!!!!!!!");
         super.onDestroy();
     }
@@ -177,9 +200,10 @@ public class TimingService extends Service {
         setMainState(MainStateGlobals.STATE_RUNNING);
 
         notification_id = 0;
-        timingNotifications.sendNotification(1, MainActivity.class,
-                "Continuing on iteration #"+current_timer_index+
-                        ". Total time: " + getTimeString(), -1, Notification.PRIORITY_HIGH);
+
+        //timingNotifications.sendNotification(1, MainActivity.class,
+        //        "Continuing on iteration #"+current_timer_index+
+        //                ". Total time: " + getTimeString(), -1, Notification.PRIORITY_HIGH);
         timerScheduling(-1);
     }
 
@@ -195,20 +219,28 @@ public class TimingService extends Service {
         current_timer_index++;
         if(current_timer_index >= times.size()){
             // stop timer
-            timingNotifications.sendNotification(1,
-                    MainActivity.class,
-                    "Finished all " + current_timer_index + " timing iterations", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
             current_timer_index = 0;
-            stopTimer();
-            if(main_activity != null) {
-                main_activity.stopTimer();
-            }
+            if(repeatState){
+                timingNotifications.sendNotification(1,
+                        MainActivity.class,
+                        "Finished all countdowns.. Repeating", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
 
-        }else {
+                timerScheduling(-1);
+            }else{
+                timingNotifications.sendNotification(1,
+                        MainActivity.class,
+                        "Finished all countdowns", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
+                stopTimer();
+                if (main_activity != null) {
+                    main_activity.stopTimer();
+                }
+            }
+        }
+        else{
 
             // continue next iteration
-            timingNotifications.sendNotification(1, MainActivity.class,
-                    "Continuing on iteration #" + current_timer_index +
+            timingNotifications.sendNotification(0, MainActivity.class,
+                    "Continuing on task #" + current_timer_index + ". " + time_fields.get(current_timer_index).getCustomText() +
                             ". Total time: " + getTimeString(), InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
             timerScheduling(-1);
         }
