@@ -1,11 +1,5 @@
 <resources>
     <string name="app_name">Task Timing</string>
-    <string name="minutes_list_">mins</string>
-    <string name="config_file">config.json</string>
-    <string name="ok">Ok</string>
-    <string name="task">Task</string>
-    <item type="id" name="TAG_BUTTON_MAIN_ACT" />
-    <item type="id" name="TAG_BUTTON_INDEX" />
-    <item type="id" name="TAG_BUTTON_SELF" />
+    <string name="ok">OK</string>
 
 </resources>

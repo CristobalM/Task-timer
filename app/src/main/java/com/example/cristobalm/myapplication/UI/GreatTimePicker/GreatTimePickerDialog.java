@@ -15,6 +15,8 @@ import android.widget.Button;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.MainActivity;
 
 import java.util.Calendar;
 
@@ -44,6 +46,8 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
     private int minutes;
     private int seconds;
 
+    MainActivity mainActivity;
+
     Button button_ok;
 
     public interface OnTimeSetListener{
@@ -53,8 +57,10 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
     public GreatTimePickerDialog(Context context, OnTimeSetListener callback, int hours, int minutes, int seconds){
         this(context, 0, callback, hours, minutes, seconds);
     }
-    public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, TimeContainer timeContainer){
+    public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, TimeContainer timeContainer, MainActivity mainActivity){
         this(context, 0, callback, timeContainer.getHours(), timeContainer.getMinutes(), timeContainer.getSeconds());
+        this.mainActivity = mainActivity;
+
     }
     public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, int hours, int minutes, int seconds){
         super(context, theme);

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
+import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
 /**
@@ -21,10 +22,12 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
     TimeLinearLayout timeLinearLayout;
     GreatTimePickerDialog greatTimePickerDialog;
     Timefield timefield;
-    public void setInfo(TimeLinearLayout timeLinearLayout , TimeContainer timeContainer, Timefield timefield){
+    MainActivity mainActivity;
+    public void setInfo(TimeLinearLayout timeLinearLayout , TimeContainer timeContainer, Timefield timefield, MainActivity mainActivity){
         this.timeLinearLayout = timeLinearLayout;
         this.timeContainer = timeContainer;
         this.timefield = timefield;
+        this.mainActivity = mainActivity;
     }
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -32,7 +35,7 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
         int minutes = timeContainer.getMinutes();
         int seconds = timeContainer.getSeconds();
         Log.d("GTPickerFragment", "hours"+hours+", minutes:"+minutes+", seconds:"+seconds);
-        greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), 0, this, timeContainer);
+        greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), 0, this, timeContainer, mainActivity);
         greatTimePickerDialog.setTitle("Select time");
         AlertDialog alert = greatTimePickerDialog.create();
 

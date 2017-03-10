@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
 
@@ -30,7 +29,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:layout_below="@id/custom_action_bar"
+        android:layout_below="@+id/custom_action_bar"
         >
 
 
@@ -48,18 +47,27 @@
                 android:layout_height="40dp"
                 />
             <ImageView
+                android:id="@+id/button_repeat"
+                android:background="@drawable/ic_repeat"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toLeftOf="@+id/button_play"
+                android:layout_marginRight="15dp"
+                />
+
+            <ImageView
                 android:id="@+id/button_play"
                 android:background="@drawable/ic_play"
-                android:layout_height="30dp"
+                android:layout_height="40dp"
                 android:layout_width="40dp"
                 android:layout_toLeftOf="@+id/button_stop"
 
                  />
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="30dp"
                 android:id="@+id/button_pause"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@drawable/ic_pause"
                 android:layout_toLeftOf="@+id/button_stop"
                 android:layout_marginLeft="15dp"
@@ -70,7 +78,7 @@
                 android:id="@+id/button_stop"
                 android:background="@drawable/ic_stop"
                 android:layout_width="40dp"
-                android:layout_height="30dp"
+                android:layout_height="40dp"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="15dp"
 
@@ -85,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ScrollView"
-            android:layout_below="@id/SecondLinearLayout"
+            android:layout_below="@+id/SecondLinearLayout"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="60dp"
             >
@@ -96,7 +104,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:id="@+id/et_list"
-
 
                 />
         </ScrollView>
@@ -127,7 +134,6 @@
 
         >
         <ImageView
-            android:id="@+id/new_list"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_sunuevo"
@@ -137,7 +143,6 @@
             />
 
         <ImageView
-            android:id="@+id/other_list"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_lists"
@@ -146,7 +151,6 @@
 
             />
         <ImageView
-            android:id="@+id/config"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_config"

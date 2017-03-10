@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragOnClickListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTOnDragListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
@@ -47,9 +48,11 @@ public class Timefield {
         }
         @Override
         public void onClick(View view){
-            GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
-            greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield);
-            greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
+            if(main_activity.getState() == MainStateGlobals.STATE_IDLE) {
+                GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
+                greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield, main_activity);
+                greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
+            }
         }
     }
 

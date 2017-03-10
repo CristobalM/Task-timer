@@ -26,7 +26,7 @@ public class GTDragOnClickListener implements View.OnTouchListener {
     }
 
     public boolean onTouch(View v, MotionEvent event){
-        if(mainActivity.current_state == MainStateGlobals.STATE_RUNNING){
+        if(mainActivity.current_state != MainStateGlobals.STATE_IDLE){
             return true;
         }
         Intent intent = new Intent();

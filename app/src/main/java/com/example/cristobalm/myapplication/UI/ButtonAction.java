@@ -35,6 +35,24 @@ class ButtonAction {
         this.button = button;
         scrollView = (ScrollView)  main_activity.findViewById(R.id.ScrollView);
 
+        switch (button_name){
+            case ButtonNameGlobals.BUTTON_PLAY:
+                if(main_activity.getState() == MainStateGlobals.STATE_RUNNING){
+                    button.setVisibility(View.INVISIBLE);
+                }
+                break;
+            case ButtonNameGlobals.BUTTON_PAUSE:
+                if(main_activity.getState() == MainStateGlobals.STATE_RUNNING){
+                    button.setVisibility(View.VISIBLE);
+                }
+                break;
+            case ButtonNameGlobals.BUTTON_ADD:
+                if(main_activity.getState() != MainStateGlobals.STATE_IDLE){
+                    button.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                }
+                break;
+        }
+
 
     }
 
@@ -85,13 +103,13 @@ class ButtonAction {
 
     }
     public void playUp(){
-            button.getBackground().clearColorFilter();
+        button.getBackground().clearColorFilter();
     }
     public void pauseUp(){
         button.getBackground().clearColorFilter();
     }
     public void addUp(){
-        if(main_activity.getState() != MainStateGlobals.STATE_RUNNING){
+        if(main_activity.getState() == MainStateGlobals.STATE_IDLE){
             button.getBackground().clearColorFilter();
         }
     }
@@ -104,6 +122,8 @@ class ButtonAction {
 
         main_activity.stopTimer();
 
+        main_activity.getState();
+
 
     }
     private void onClickButtonPlay(){
@@ -113,24 +133,35 @@ class ButtonAction {
 
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
-        ArrayList<Integer> millisecondsList = main_activity.getMillisecondsList();
-        Intent intent = new Intent(context, TimingService.class);
-        intent.putIntegerArrayListExtra(InfoNameGlobals.REPEAT_TIME_LIST, millisecondsList);
-        intent.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.START_TIMING);
+        switch (main_activity.getState()){
+            case MainStateGlobals.STATE_PAUSED:
+                main_activity.mService.unPauseTimer();
+                break;
+            case MainStateGlobals.STATE_IDLE:
+                ArrayList<Integer> millisecondsList = main_activity.getMillisecondsList();
+                Intent intent = new Intent(context, TimingService.class);
+                intent.putIntegerArrayListExtra(InfoNameGlobals.REPEAT_TIME_LIST, millisecondsList);
+                intent.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.START_TIMING);
+                context.startService(intent);
+                main_activity.mService.startTimer();
+        }
+
         main_activity.blockInputs();
-        context.startService(intent);
-        main_activity.mService.startTimer();
         main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE)).setVisibility(View.VISIBLE);
         button.setVisibility(View.INVISIBLE);
+        main_activity.getState();
     }
     private void onClickButtonPause(){
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
         main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).setVisibility(View.VISIBLE);
         button.setVisibility(View.INVISIBLE);
 
+        main_activity.pauseTimer();
+        main_activity.getState();
+
     }
     private void onClickButtonAdd(){
-        if(main_activity.getState() == MainStateGlobals.STATE_RUNNING){
+        if(main_activity.getState() != MainStateGlobals.STATE_IDLE){
             return;
         }
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.Image;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -21,10 +21,7 @@ import android.widget.Toast;
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
-import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.R;
-import com.example.cristobalm.myapplication.Storage.StateStorage;
-import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
 
@@ -38,11 +35,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Timefield> time_fields;
     Hashtable<Integer, Timefield> map_timefields;
     LinearLayout et_list;
-    StateStorage stateStorage;
     boolean enabled_inputs;
     boolean mBound;
     TimingService mService;
-    TimeCountdown current_countdown;
 
     public int current_state;
     private int current_index;
@@ -50,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
+
+    public void pauseTimer(){
+        if(mService == null){
+            return;
+        }
+        mService.pauseTimer();
+    }
 
 
     public void stopTimer(){
@@ -61,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
         if(!isEnabled_inputs()) {
             enableInputs();
         }
-        if(current_countdown != null) {
-            current_countdown.stopCountDown();
-        }
-
 
         ImageView button_play = buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY ));
         ImageView button_pause =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE));
@@ -128,15 +126,7 @@ public class MainActivity extends AppCompatActivity {
         return current_state;
     }
 
-    public void checkForCountdown(){
-        if(mService != null){
-            setCurrentIndex(mService.getCurrent_timer_index());
-            if(getState() == MainStateGlobals.STATE_RUNNING){
-                Timefield current_timefield = time_fields.get(getCurrent_index());
-                startTimeCountDown(current_timefield, mService);
-            }
-        }
-    }
+
     public void showThrashCan(){
         thrashCan.setVisibility(View.VISIBLE);
         thrashCan.invalidate();
@@ -147,17 +137,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void setTimefields(ArrayList<Timefield> timefields){
+        this.time_fields = timefields;
+    }
+
+
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+
             TimingService.LocalBinder binder = (TimingService.LocalBinder) service;
             mService = binder.getService();
             mService.setActivityInstance(getMyInstance());
             mBound = true;
-            if(current_state != MainStateGlobals.STATE_RUNNING) {
-                mService.setTimeList(time_fields);
-            }
-            checkForCountdown();
+
+            setTimefields(mService.retrieveTimefields());
+
+            startUI();
+
         }
 
         @Override
@@ -166,11 +163,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void startTimeCountDown(Timefield timefield,
-                                            TimingService _service){
-
-        current_countdown.startNewCountDown(timefield, _service);
-    }
 
     public Hashtable<Integer, Timefield> copyTimefieldList(ArrayList<Timefield> src){
         Hashtable<Integer, Timefield> hashtable = new Hashtable<Integer, Timefield>();
@@ -187,10 +179,11 @@ public class MainActivity extends AppCompatActivity {
         unique_index = 0;
         setContentView(R.layout.activity_main);
 
-        stateStorage = new StateStorage(getApplicationContext(), FilenameGlobals.STORED_STATES);
-        time_fields = stateStorage.getTimeFieldsList(StateGlobals.SAVE_STATE);
-        map_timefields = copyTimefieldList(time_fields);
 
+    }
+
+    public void startUI(){
+        map_timefields = copyTimefieldList(time_fields);
         int et_listID = getResources().getIdentifier(ET_LIST, "id", getPackageName());
         et_list = (LinearLayout) findViewById(et_listID);
         et_list.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -202,7 +195,6 @@ public class MainActivity extends AppCompatActivity {
         thrashCan = (ThrashCan)findViewById(R.id.thrash_can);
         thrashCan.setOnDragListener(new ThrashOnDragListener(this, thrashCan));
         thrashCan.setVisibility(View.INVISIBLE);
-
     }
 
     @Override
@@ -210,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         Intent intent = new Intent(this, TimingService.class);
-        current_countdown = new TimeCountdown();
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -240,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < time_fields.size(); i++){
             time_fields.get(i).blockInput();
         }
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);  // setVisibility(View.INVISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);  // setVisibility(View.INVISIBLE);
         enabled_inputs = false;
 
     }
@@ -258,8 +249,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTimeFieldsDisplay(){
         et_list.removeAllViews();
+        et_list.invalidate();
         for (int i = 0; i < time_fields.size(); i++) {
             time_fields.get(i).startTimefieldView(this);
+            LinearLayout tl = time_fields.get(i).getLayout();
+            if(tl.getParent() != null){
+                ((ViewGroup) tl.getParent()).removeView(tl);
+            }
             et_list.addView(time_fields.get(i).getLayout());
         }
     }
@@ -299,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
         buttons = new ArrayList<>();
         ArrayList<String> buttons_names = ButtonNameGlobals.getNamesList();
         for(int i = 0; i < buttons_names.size(); i++ ) {
+            Log.d("addListenerButtons", "trying to get button name: " + buttons_names.get(i) );
             int resID = getResources().getIdentifier(buttons_names.get(i), "id", getPackageName());
             ImageView button = (ImageView) findViewById(resID);
             buttons.add(button);
@@ -317,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void saveState(int state){
-        if(stateStorage != null && time_fields != null) {
-            stateStorage.storeTimeFieldsList(time_fields, state);
+        if(mService != null && mService.getStateStorage() != null && time_fields != null) {
+            mService.getStateStorage().storeTimeFieldsList(time_fields, state);
             Log.d("saveState","Saving state #"+state);
         }
     }
