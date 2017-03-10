@@ -7,6 +7,7 @@ import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 
 /**
@@ -25,6 +26,9 @@ public class GTDragOnClickListener implements View.OnTouchListener {
     }
 
     public boolean onTouch(View v, MotionEvent event){
+        if(mainActivity.current_state == MainStateGlobals.STATE_RUNNING){
+            return true;
+        }
         Intent intent = new Intent();
         intent.putExtra(SOURCE_INDEX, source_index);
         ClipData.Item item = new ClipData.Item(intent);

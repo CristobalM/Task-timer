@@ -3,8 +3,12 @@ package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
@@ -13,7 +17,7 @@ import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
  * Created by cristobalm on 3/4/17.
  */
 
-public class TimeDraggable extends View {
+public class TimeDraggable extends AppCompatImageView {
     AttributeSet attrs;
     float scale;
     public TimeDraggable(Context context){
@@ -34,6 +38,14 @@ public class TimeDraggable extends View {
 
     protected void init(){
         //scale = getResources().getDisplayMetrics().density;
+        Drawable drawable;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            drawable = getResources().getDrawable(R.drawable.ic_draggable , null);
+        }
+        else{
+            drawable =  getResources().getDrawable(R.drawable.ic_draggable);
+        }
+        setImageDrawable(drawable);
     }
 
     /*

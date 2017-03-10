@@ -1,5 +1,7 @@
 package com.example.cristobalm.myapplication.Services.Globals;
 
+import com.example.cristobalm.myapplication.R;
+
 /**
  * Created by cristobalm on 3/3/17.
  */
@@ -14,5 +16,8 @@ public class InfoNameGlobals {
     public static final String STOP_TIMING = "STOP_TIMING";
     public static final String PAUSE_TIMING = "PAUSE_TIMING";
     public static final String CONTINUE_TIMING = "CONTINUE_TIMING";
+
+    // Sound notifications
+    public static final int NOTIFICATION_ONE = R.raw.tasktimer_notif_1;
 
 }

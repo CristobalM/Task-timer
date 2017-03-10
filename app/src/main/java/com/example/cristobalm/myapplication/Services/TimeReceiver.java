@@ -19,5 +19,6 @@ public class TimeReceiver extends BroadcastReceiver {
         Intent next_iter = new Intent(context, TimingService.class);
         next_iter.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.CONTINUE_TIMING);
         context.startService(next_iter);
+
     }
 }

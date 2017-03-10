@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
@@ -34,7 +35,7 @@ public class GTOnDragListener implements View.OnDragListener {
         final int action  = event.getAction();
         switch (action){
             case DragEvent.ACTION_DRAG_STARTED:
-                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT)) {
+                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT) && mainActivity.current_state != MainStateGlobals.STATE_RUNNING) {
                     //Log.d("ACTION_DRAG_STARTED", "I am " + timeLinearLayout.getDescription() + " receiving call!");
                     v.invalidate();
                     return true;

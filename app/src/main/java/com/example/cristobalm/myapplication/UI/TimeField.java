@@ -138,4 +138,8 @@ public class Timefield {
     public int getStatic_index(){
         return static_index;
     }
+
+    public void restoreTime(){
+        timeLinearLayout.setTime(time_container);
+    }
 }

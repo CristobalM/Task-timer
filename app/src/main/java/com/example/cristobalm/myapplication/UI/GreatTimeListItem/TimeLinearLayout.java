@@ -99,7 +99,6 @@ public class TimeLinearLayout extends LinearLayout {
         timeDraggable.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDraggable));
 
 
-
         //timeCountdownView.setId(R.id.time_countdown_view);// DON'T EVER DO THIS
         int countdown_width = VisualSettingGlobals.getPixels(100, scale);
         timeCountdownView.setLayoutParams(new LayoutParams(countdown_width, LayoutParams.MATCH_PARENT));

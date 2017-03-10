@@ -10,6 +10,7 @@ import android.view.DragEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 
 /**
@@ -29,7 +30,7 @@ public class ThrashOnDragListener implements View.OnDragListener {
         final int action  = event.getAction();
         switch (action){
             case DragEvent.ACTION_DRAG_STARTED:
-                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT)) {
+                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT) && mainActivity.current_state != MainStateGlobals.STATE_RUNNING) {
 
                     return true;
                 }

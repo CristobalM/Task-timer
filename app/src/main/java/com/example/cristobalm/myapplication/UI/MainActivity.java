@@ -1,18 +1,20 @@
 package com.example.cristobalm.myapplication.UI;
 
-import android.app.ActionBar;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Typeface;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.media.Image;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
-import android.widget.Button;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -32,7 +34,7 @@ import java.util.Hashtable;
 
 public class MainActivity extends AppCompatActivity {
     public static final String ET_LIST = "et_list";
-    ArrayList<Button> buttons;
+    ArrayList<ImageView> buttons;
     ArrayList<Timefield> time_fields;
     Hashtable<Integer, Timefield> map_timefields;
     LinearLayout et_list;
@@ -48,6 +50,35 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
+
+
+    public void stopTimer(){
+        if(mService!=null) {
+            Intent intent = new Intent(this, TimingService.class);
+            mService.stopTimer();
+            stopService(intent);
+        }
+        if(!isEnabled_inputs()) {
+            enableInputs();
+        }
+        if(current_countdown != null) {
+            current_countdown.stopCountDown();
+        }
+
+
+        ImageView button_play = buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY ));
+        ImageView button_pause =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE));
+        ImageView button_add =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD));
+        button_play.setVisibility(View.VISIBLE);
+        button_pause.setVisibility(View.INVISIBLE);
+        button_add.getBackground().clearColorFilter();
+
+        reloadList();
+
+
+
+        getState();
+    }
 
 
 
@@ -92,11 +123,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public int getState(){
+        current_state = mService.getMainState();
+        return current_state;
+    }
+
     public void checkForCountdown(){
         if(mService != null){
-            current_state = mService.getMainState();
             setCurrentIndex(mService.getCurrent_timer_index());
-            if(current_state == MainStateGlobals.STATE_RUNNING){
+            if(getState() == MainStateGlobals.STATE_RUNNING){
                 Timefield current_timefield = time_fields.get(getCurrent_index());
                 startTimeCountDown(current_timefield, mService);
             }
@@ -205,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < time_fields.size(); i++){
             time_fields.get(i).blockInput();
         }
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).setVisibility(View.INVISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);  // setVisibility(View.INVISIBLE);
         enabled_inputs = false;
 
     }
@@ -213,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < time_fields.size(); i++){
             time_fields.get(i).enableInput();
         }
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).setVisibility(View.VISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().clearColorFilter(); // .setVisibility(View.VISIBLE);
         enabled_inputs = true;
     }
     public boolean isEnabled_inputs(){
@@ -229,23 +264,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public class mainButtonListener implements View.OnTouchListener{
+        ImageView button;
+        ButtonAction receivedButtonAction;
+        MainActivity mainActivity;
+        mainButtonListener(ImageView button, ButtonAction receivedButtonAction, MainActivity mainActivity){
+            this.button = button;
+            this.receivedButtonAction = receivedButtonAction;
+            this.mainActivity = mainActivity;
+        }
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            switch(event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    receivedButtonAction.setContext(getApplicationContext());
+                    receivedButtonAction.Run();
+
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    receivedButtonAction.actionUp();
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    //v.getBackground().clearColorFilter();
+                    return true;
+            }
+            return false;
+        }
+
+    }
+
+
     public void addListenerButtons(){
         buttons = new ArrayList<>();
         ArrayList<String> buttons_names = ButtonNameGlobals.getNamesList();
         for(int i = 0; i < buttons_names.size(); i++ ) {
             int resID = getResources().getIdentifier(buttons_names.get(i), "id", getPackageName());
-            Button button = (Button) findViewById(resID);
+            ImageView button = (ImageView) findViewById(resID);
             buttons.add(button);
-            ButtonAction b_act = new ButtonAction(buttons_names.get(i), this);
-            button.setTag(b_act);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ButtonAction receivedButtonAction = (ButtonAction) v.getTag();
-                    receivedButtonAction.setContext(getApplicationContext());
-                    receivedButtonAction.run();
-                }
-            });
+            ButtonAction b_act = new ButtonAction(buttons_names.get(i), this, button);
+            button.setOnTouchListener(new mainButtonListener(button,b_act, this));
         }
     }
 
@@ -254,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < time_fields.size(); i++) {
             et_list.addView(time_fields.get(i).getLayout());
             time_fields.get(i).setIndex(i);
+            time_fields.get(i).restoreTime();
         }
     }
 

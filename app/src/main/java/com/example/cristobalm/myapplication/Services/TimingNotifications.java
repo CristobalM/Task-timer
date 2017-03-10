@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -29,9 +31,12 @@ public class TimingNotifications {
 
     private Notification createNotification (Class target_activity_class, String text_notif){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_timer_black_24px)
+                .setSmallIcon(R.drawable.ic_clocklogo_more_contrast )
                 .setContentTitle("Great Timer")
-                .setContentText(text_notif);
+                .setContentText(text_notif)
+                .setPriority(Notification.PRIORITY_MAX)
+                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
+                .setLights(Color.RED, 3000, 3000);
 
         Intent targetIntent = new Intent(context, target_activity_class);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -40,8 +45,13 @@ public class TimingNotifications {
         return mBuilder.build();
     }
 
-    public void sendNotification(int nID, Class target_activity_class, String text_notif){
+    public void sendNotification(int nID, Class target_activity_class, String text_notif, int notification_sound){
         Notification notification = createNotification(target_activity_class, text_notif);
+        notification.defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE;
+
+        if(notification_sound > -1) {
+            notification.sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + notification_sound);
+        }
         notificationManager.notify(nID, notification);
     }
 

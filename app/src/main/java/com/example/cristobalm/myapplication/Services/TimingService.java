@@ -60,6 +60,7 @@ public class TimingService extends Service {
 
     @Override
     public IBinder onBind(Intent intent){
+
         current_state = MainStateGlobals.STATE_IDLE;
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         if(timingNotifications == null) {
@@ -119,7 +120,7 @@ public class TimingService extends Service {
         notification_id = 0;
         timingNotifications.sendNotification(notification_id, MainActivity.class,
                 "Continuing on iteration #"+current_timer_index+
-                        ". Total time: " + getTimeString());
+                        ". Total time: " + getTimeString(), -1);
         timerScheduling();
     }
 
@@ -136,16 +137,21 @@ public class TimingService extends Service {
         current_timer_index++;
         if(current_timer_index >= times.size()){
             // stop timer
-            timingNotifications.sendNotification(notification_id, MainActivity.class, "Finished all " + current_timer_index + " timing iterations");
+            timingNotifications.sendNotification(notification_id,
+                    MainActivity.class,
+                    "Finished all " + current_timer_index + " timing iterations", InfoNameGlobals.NOTIFICATION_ONE);
             current_timer_index = 0;
             stopTimer();
+            if(main_activity != null) {
+                main_activity.stopTimer();
+            }
 
         }else {
 
             // continue next iteration
             timingNotifications.sendNotification(notification_id, MainActivity.class,
                     "Continuing on iteration #" + current_timer_index +
-                            ". Total time: " + getTimeString());
+                            ". Total time: " + getTimeString(), InfoNameGlobals.NOTIFICATION_ONE);
             timerScheduling();
         }
     }

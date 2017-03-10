@@ -15,7 +15,7 @@
         android:id="@+id/custom_action_bar"
         >
         <ImageView
-            android:layout_width="100dp"
+            android:layout_width="208dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_clocklogo_actionbar"
             android:layout_centerVertical="true"
@@ -41,31 +41,32 @@
             android:orientation="horizontal"
             android:id="@+id/SecondLinearLayout"
             >
-            <Button
+            <ImageView
                 android:id="@+id/button_add"
                 android:background="@drawable/ic_add"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 />
-            <Button
+            <ImageView
                 android:id="@+id/button_play"
                 android:background="@drawable/ic_play"
                 android:layout_height="30dp"
                 android:layout_width="40dp"
-                android:layout_toLeftOf="@+id/button_pause"
+                android:layout_toLeftOf="@+id/button_stop"
 
                  />
 
-            <Button
+            <ImageView
                 android:layout_width="40dp"
                 android:layout_height="30dp"
                 android:id="@+id/button_pause"
                 android:background="@drawable/ic_pause"
                 android:layout_toLeftOf="@+id/button_stop"
                 android:layout_marginLeft="15dp"
+                android:visibility="invisible"
 
                 />
-            <Button
+            <ImageView
                 android:id="@+id/button_stop"
                 android:background="@drawable/ic_stop"
                 android:layout_width="40dp"
@@ -86,7 +87,7 @@
             android:id="@+id/ScrollView"
             android:layout_below="@id/SecondLinearLayout"
             android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="60dp"
             >
 
 
