@@ -28,6 +28,7 @@ public class TimeDraggable extends AppCompatImageView {
         super(context, attrs, defStyle);
         this.attrs = attrs;
         init();
+        int a;
     }
     public TimeDraggable(Context context, AttributeSet attrs){
         super(context, attrs);
