@@ -15,8 +15,10 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.Services.TimingService;
@@ -25,15 +27,17 @@ import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
+import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 
 
 public class MainActivity extends AppCompatActivity {
     public static final String ET_LIST = "et_list";
     ArrayList<ImageView> buttons;
-    ArrayList<Timefield> time_fields;
+    ArrayList<Integer> time_fields;
     Hashtable<Integer, Timefield> map_timefields;
     LinearLayout et_list;
     boolean enabled_inputs;
@@ -46,6 +50,25 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
+
+    ScrollView scrollView;
+
+
+
+    public ScrollView getScrollView(){
+        if(scrollView == null) {
+         scrollView = (ScrollView) findViewById(R.id.ScrollView);
+        }
+        return scrollView;
+    }
+
+
+
+    public void addTimefield(Timefield timefield){
+        if(mService != null){
+            mService.addTimefield(timefield);
+        }
+    }
 
 
 
@@ -104,17 +127,16 @@ public class MainActivity extends AppCompatActivity {
             time_fields.add(dest.getIndex(),
                     time_fields.remove(source.getIndex()));
 
-            reloadList();
         }else{
             Toast.makeText(getApplicationContext(), "Some error occurred during dragging operation", Toast.LENGTH_LONG).show();
         }
+        reloadList();
     }
     public void removeTimeField(int static_which){
         Log.d("removeTimeField", "Trying to delete Timefield with static index: "+ static_which);
         Timefield target = map_timefields.get(static_which);
         if(static_which > -1 && target != null && time_fields.size()>0 && time_fields.size() > target.getIndex()) {
             time_fields.remove(target.getIndex());
-            reloadList();
         }
         else{
             Log.e("removeTimeField",
@@ -124,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                             " target.getIndex: " + String.valueOf((target != null ? target.getIndex() : "ES NULO"))
             );
         }
+        reloadList();
     }
 
     public int getState(){
@@ -142,11 +165,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setTimefields(ArrayList<Timefield> timefields){
+    public void setTimefields(ArrayList<Integer> timefields){
         this.time_fields = timefields;
     }
 
-
+    public Timefield getTFAt(int index){
+        if(mService != null){
+            return mService.getTFAt(index);
+        }else{
+            return null;
+        }
+    }
+    public void setMapTimeFields(Hashtable<Integer, Timefield> ht){
+        map_timefields = ht;
+    }
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -156,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
             mService.setActivityInstance(getMyInstance());
             mBound = true;
 
+
+            setMapTimeFields(mService.retrieveMapTimefields());
             setTimefields(mService.retrieveTimefields());
 
             startUI();
@@ -169,13 +203,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    public Hashtable<Integer, Timefield> copyTimefieldList(ArrayList<Timefield> src){
-        Hashtable<Integer, Timefield> hashtable = new Hashtable<Integer, Timefield>();
-        for(int i = 0; i < src.size(); i++){
-            hashtable.put(src.get(i).getIndex(), src.get(i));
-        }
-        return hashtable;
-    }
 
 
     @Override
@@ -188,7 +215,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startUI(){
-        map_timefields = copyTimefieldList(time_fields);
         int et_listID = getResources().getIdentifier(ET_LIST, "id", getPackageName());
         et_list = (LinearLayout) findViewById(et_listID);
         et_list.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -234,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void blockInputs(){
         for(int i = 0; i < time_fields.size(); i++){
-            time_fields.get(i).blockInput();
+            getTFAt(i).blockInput();
         }
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);  // setVisibility(View.INVISIBLE);
         enabled_inputs = false;
@@ -242,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void enableInputs(){
         for(int i = 0; i < time_fields.size(); i++){
-            time_fields.get(i).enableInput();
+            getTFAt(i).enableInput();
         }
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().clearColorFilter(); // .setVisibility(View.VISIBLE);
         enabled_inputs = true;
@@ -256,12 +282,12 @@ public class MainActivity extends AppCompatActivity {
         et_list.removeAllViews();
         et_list.invalidate();
         for (int i = 0; i < time_fields.size(); i++) {
-            time_fields.get(i).startTimefieldView(this);
-            LinearLayout tl = time_fields.get(i).getLayout();
+            getTFAt(i).startTimefieldView(this);
+            LinearLayout tl = getTFAt(i).getLayout();
             if(tl.getParent() != null){
                 ((ViewGroup) tl.getParent()).removeView(tl);
             }
-            et_list.addView(time_fields.get(i).getLayout());
+            et_list.addView(getTFAt(i).getLayout());
         }
     }
 
@@ -312,22 +338,28 @@ public class MainActivity extends AppCompatActivity {
     public void reloadList(){
         et_list.removeAllViews();
         for (int i = 0; i < time_fields.size(); i++) {
-            et_list.addView(time_fields.get(i).getLayout());
-            time_fields.get(i).setIndex(i);
-            time_fields.get(i).restoreTime();
+            Timefield selected_timefield = getTFAt(i);
+            ViewParent parent = selected_timefield.getLayout().getParent();
+            if(parent != null){
+                ((ViewGroup)parent).removeView(selected_timefield.getLayout());
+            }
+            et_list.addView(selected_timefield.getLayout());
+            selected_timefield.setIndex(i);
+            selected_timefield.restoreTime();
             //time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().getBackground().clearColorFilter();
-            time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(mService, R.color.colorCountdownBackground));
-            time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().invalidate();
-            time_fields.get(i).setHint(i);
-            time_fields.get(i).enableInput();
-            time_fields.get(i).getTimeLinearLayout().getTimeDescription().invalidate();
+            selected_timefield.getTimeLinearLayout().getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(mService, R.color.colorCountdownBackground));
+            selected_timefield.getTimeLinearLayout().getTimeCountdownView().invalidate();
+            selected_timefield.setHint(i);
+            selected_timefield.enableInput();
+            selected_timefield.getTimeLinearLayout().getTimeDescription().invalidate();
+
         }
         et_list.invalidate();
     }
 
     public void saveState(int state){
         if(mService != null && mService.getStateStorage() != null && time_fields != null) {
-            mService.getStateStorage().storeTimeFieldsList(time_fields, state);
+            mService.getStateStorage().storeTimeFieldsList(time_fields, map_timefields, state);
             Log.d("saveState","Saving state #"+state);
         }
     }
@@ -342,13 +374,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Integer> out_list = new ArrayList<>();
 
         for(int i = 0; i < time_fields.size(); i++){
-            out_list.add(time_fields.get(i).getMilliseconds());
+            out_list.add(getTFAt(i).getMilliseconds());
         }
 
         return out_list;
     }
 
-    public ArrayList<Timefield> getTime_fields(){
+    public ArrayList<Integer> getTime_fields(){
         return time_fields;
     }
 

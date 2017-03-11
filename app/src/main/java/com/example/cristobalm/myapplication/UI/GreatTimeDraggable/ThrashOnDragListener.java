@@ -45,8 +45,11 @@ public class ThrashOnDragListener implements View.OnDragListener {
                 ClipData.Item item = event.getClipData().getItemAt(0);
                 Intent intent = item.getIntent();
                 int result = intent.getIntExtra(GTDragOnClickListener.SOURCE_INDEX, -1);
-
-                mainActivity.mService.addSecondsToTotal(-mainActivity.getTimefieldByUniqueID(result).getMilliseconds());
+                if(mainActivity.mService != null && mainActivity.getTimefieldByUniqueID(result) != null) {
+                    mainActivity.mService.addSecondsToTotal(-mainActivity.getTimefieldByUniqueID(result).getMilliseconds());
+                }else{
+                    Log.e("ThrashOnDragListener", "Error retrieving timefield by unique id or service not active");
+                }
                 mainActivity.removeTimeField(result);
                 v.invalidate();
                 return true;

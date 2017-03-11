@@ -3,6 +3,7 @@ package com.example.cristobalm.myapplication.Storage;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Timefield;
@@ -12,6 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
 
 /**
  * Created by cristobalm on 3/2/17.
@@ -47,43 +50,47 @@ public final class StateStorage {
             Log.e("storeStateIntoJSONFile", "Can not parse json data");
         }
     }
-    public void storeTimeFieldsList(ArrayList<Timefield> time_fields, int state){
+
+    public void storeTimeFieldsList(ArrayList<Integer> time_fields, Hashtable<Integer, Timefield> map, int state){
         JSONArray list_building = new JSONArray();
         for(int i = 0; i < time_fields.size(); i++){
             JSONObject temp_pair = new JSONObject();
             try {
-                temp_pair.put(CUSTOM_TEXT, time_fields.get(i).getCustomText());
-                temp_pair.put(MILLISECONDS, time_fields.get(i).getMilliseconds());
+                temp_pair.put(CUSTOM_TEXT, map.get(time_fields.get(i)).getCustomText());
+                temp_pair.put(MILLISECONDS, map.get(time_fields.get(i)).getMilliseconds());
                 list_building.put(temp_pair);
-                Log.d("storeTimeFieldsList", "storing field with name "+ time_fields.get(i).getCustomText());
+                Log.d("storeTimeFieldsList", "storing field with name "+ map.get(time_fields.get(i)).getCustomText());
             }
             catch(JSONException e){
-                Log.d("storeTimeFieldsList", "can not store element with custom text:" + time_fields.get(i).getCustomText() );
+                Log.d("storeTimeFieldsList", "can not store element with custom text:" + map.get(time_fields.get(i)).getCustomText() );
             }
         }
         storeStateIntoJSONFile(TIME_FIELDS, list_building, state);
     }
 
-    public ArrayList<Timefield> getTimeFieldsList(int state){
+    public Pair<Hashtable<Integer, Timefield>, Integer> getTimeFieldsList(int state){
         JSONArray receive_data = getStateList(TIME_FIELDS, state);
-        ArrayList<Timefield> time_fields = new ArrayList<>();
+        //LinkedList<Timefield> time_fields = new LinkedList<>();
+        Hashtable<Integer, Timefield> map_time_fields = new Hashtable<>();
         if(receive_data == null){
             Log.d("getTimeFieldsList", "receive_data is null!!");
-            return time_fields;
+            return null;
         }
         for(int i = 0; i < receive_data.length(); i++){
             try {
                 JSONObject pair = receive_data.getJSONObject(i);
                 Log.d("getTimeFieldsListLoop", "index:"+i+", string:"+pair.getString(CUSTOM_TEXT));
                 Timefield tfield = new Timefield(context, i, pair.getString(CUSTOM_TEXT), Integer.parseInt(pair.getString(MILLISECONDS)));
-                time_fields.add(tfield);
+                //time_fields.addLast(tfield);
+                map_time_fields.put(i, tfield);
+
             }
             catch (JSONException e){
                 Log.d("getTimeFieldsList", "can not read pair with index " + i);
             }
         }
 
-        return time_fields;
+        return new Pair<>(map_time_fields, receive_data.length()) ;
     }
     private String getFileJSONString(){ // Correct with commments
         String current_data;

@@ -18,6 +18,7 @@ import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 /**
@@ -31,11 +32,19 @@ class ButtonAction {
     private MainActivity main_activity;
     private ImageView button;
     private ScrollView scrollView;
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if(scrollView != null) {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        }
+    };
     ButtonAction(String button_name, MainActivity caller_instance, ImageView button){
         this.button_name = button_name;
         this.main_activity = caller_instance;
         this.button = button;
-        scrollView = (ScrollView)  main_activity.findViewById(R.id.ScrollView);
+        scrollView = main_activity.getScrollView();
 
         switch (button_name){
             case ButtonNameGlobals.BUTTON_PLAY:
@@ -187,18 +196,20 @@ class ButtonAction {
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
 
-        ArrayList<Timefield> time_fields = main_activity.getTime_fields();
+        ArrayList<Integer> time_fields = main_activity.getTime_fields();
         LinearLayout et_list = main_activity.getEt_list();
 
 
         Timefield time_f_single = new Timefield(context, time_fields.size(), main_activity);
-        time_fields.add(time_f_single);
+        main_activity.addTimefield(time_f_single);
 
         int static_index = main_activity.map_timefields.size();
 
         main_activity.map_timefields.put(static_index,time_f_single);
         et_list.addView(time_f_single.getLayout());
-        scrollView.fullScroll(View.FOCUS_DOWN);
+        //scrollView.fullScroll(View.FOCUS_DOWN);
+        //time_f_single.getLayout().requestFocus();
+        scrollView.post(runnable);
 
     }
     private void onClickButtonRepeat(){

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.LinearLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
@@ -20,7 +21,11 @@ import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
 
 /**
  * Created by cristobalm on 3/2/17.
@@ -30,7 +35,8 @@ import java.util.ArrayList;
 public class TimingService extends Service {
     private int mStartMode;
     private int current_state = MainStateGlobals.STATE_IDLE;
-    private ArrayList<Timefield> time_fields;
+    private LinkedList<Timefield> time_fields_init;
+    private ArrayList<Integer> time_fields;
     private int current_timer_index;
     AlarmManager alarmManager;
     TimingNotifications timingNotifications;
@@ -41,6 +47,9 @@ public class TimingService extends Service {
     StateStorage configStates;
     ServiceCountdown serviceCountdown;
 
+    Hashtable<Integer, Timefield> map_timefields;
+
+
     private Boolean repeatState;
 
     private long last_remaining_millis;
@@ -48,6 +57,14 @@ public class TimingService extends Service {
     private final IBinder mBinder = new LocalBinder();
 
     private Integer totalSeconds;
+
+    public Timefield getTFAt(int index){
+        return map_timefields.get(time_fields.get(index));
+    }
+    public void addTimefield(Timefield timefield){
+        map_timefields.put(time_fields.size(), timefield);
+        time_fields.add(time_fields.size());
+    }
 
     public long getLastRemainingMillis(){
         return last_remaining_millis;
@@ -61,7 +78,7 @@ public class TimingService extends Service {
         if(totalSeconds == null){
             totalSeconds = 0;
             for(int i = 0; i < time_fields.size(); i++){
-                totalSeconds += time_fields.get(i).getMilliseconds()/1000;
+                totalSeconds += getTFAt(i).getMilliseconds()/1000;
             }
         }
         return totalSeconds;
@@ -84,12 +101,30 @@ public class TimingService extends Service {
         return configStates;
     }
 
-    public ArrayList<Timefield> retrieveTimefields(){
-        if(time_fields == null) {
-            time_fields = getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
+    public Hashtable<Integer, Timefield> retrieveMapTimefields(){
+        if(map_timefields == null || time_fields == null) {
+
+            Pair<Hashtable<Integer, Timefield>, Integer> pair  = getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
+            map_timefields = pair.first;
+            int init_size = pair.second;
+            time_fields = new ArrayList<>(init_size);
+
+            Log.d("retrieveMapTimefields", "init_size = " + init_size);
+
+            for(int i = 0; i < init_size; i++){
+                time_fields.add(i);
+            }
+        }
+        return map_timefields;
+    }
+    public ArrayList<Integer> retrieveTimefields(){
+        if(time_fields == null){
+            retrieveMapTimefields();
         }
         return time_fields;
     }
+
+
 
     public boolean getRepeatState(){
         if(repeatState==null){
@@ -247,7 +282,7 @@ public class TimingService extends Service {
 
             // continue next iteration
             timingNotifications.sendNotification(0, MainActivity.class,
-                    "Continuing on task #" + current_timer_index + ". " + time_fields.get(current_timer_index).getCustomText() +
+                    "Continuing on task #" + current_timer_index + ". " + getTFAt(current_timer_index).getCustomText() +
                             ". Total time: " + getTimeString(), InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
             timerScheduling(-1);
         }
@@ -259,19 +294,19 @@ public class TimingService extends Service {
             to_add = from_pause_millis;
         }
         else{
-            to_add = time_fields.get(current_timer_index).getMilliseconds();
+            to_add =getTFAt(current_timer_index).getMilliseconds();
         }
         Intent intent = new Intent(getApplicationContext(), TimeReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
         nextMillis = System.currentTimeMillis() + to_add;
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, nextMillis, pendingIntent);
-        serviceCountdown.startNewCountDown(time_fields.get(current_timer_index), this);
+        serviceCountdown.startNewCountDown(getTFAt(current_timer_index), this);
     }
 
     private String getTimeString(){
         if(time_fields != null && time_fields.size() > current_timer_index) {
-            return TimeContainer.getTimeString(time_fields.get(current_timer_index).getMilliseconds());
+            return TimeContainer.getTimeString(getTFAt(current_timer_index).getMilliseconds());
         }
         else{
             return "--:--:--";

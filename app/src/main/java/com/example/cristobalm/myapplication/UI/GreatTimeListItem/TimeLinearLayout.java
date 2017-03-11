@@ -80,6 +80,10 @@ public class TimeLinearLayout extends LinearLayout {
         init();
     }
 
+    public float getScale(){
+        return scale;
+    }
+
     private void init(){
         scale=  getResources().getDisplayMetrics().density;
         items_container = new LinearLayout(context);
@@ -183,8 +187,8 @@ public class TimeLinearLayout extends LinearLayout {
         measureChildren(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public void setCountdownListener(OnClickListener listener){
-        timeCountdownView.setOnClickListener(listener);
+    public void setCountdownListener(OnTouchListener listener){
+        timeCountdownView.setOnTouchListener(listener);
     }
 
     public void setDescription(String description){
@@ -200,21 +204,12 @@ public class TimeLinearLayout extends LinearLayout {
         timeCountdownView.setFocusable(false);
     }
 
-    
+
 
     public void enableEditables(){
-        timeDescription.setFocusable(true);
         timeDescription.setFocusableInTouchMode(true);
-        timeDescription.setClickable(true);
-        timeDescription.setSelectAllOnFocus(true);
+        timeDescription.setFocusable(true);
 
-
-
-        if(timeDescription.getText()== null  || timeDescription.getText().toString()==""){
-            timeDescription.setText("");
-        }
-
-        //timeDescription.setEnabled(true);
         timeCountdownView.setFocusableInTouchMode(true);
     }
 
@@ -240,8 +235,6 @@ public class TimeLinearLayout extends LinearLayout {
         if(!toggled) {
             this.addView(imageView);
         }
-        timeDescription.setFocusable(false);
-        timeDescription.setKeyListener(null);
         toggled = true;
     }
     public void toggleDragOutHover(){
@@ -249,8 +242,6 @@ public class TimeLinearLayout extends LinearLayout {
             this.removeView(imageView);
             toggled = false;
         }
-        timeDescription.setFocusableInTouchMode(true);
-        timeDescription.setKeyListener(descriptionKeyListener);
 
     }
     public void restoreNotDragState(){

@@ -21,7 +21,7 @@ import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
  * Edit text for each item
  */
 
-public class TimeDescription extends AppCompatEditText {
+public class TimeDescription extends EditText {
 
     AttributeSet attrs;
 

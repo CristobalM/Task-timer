@@ -3,15 +3,18 @@ package com.example.cristobalm.myapplication.UI;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragOnClickListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTOnDragListener;
+import com.example.cristobalm.myapplication.UI.GreatTimeListItem.DescriptionTouchEvent;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 import com.example.cristobalm.myapplication.UI.GreatTimePicker.GreatTimePickerFragment;
 
@@ -32,6 +35,24 @@ public class Timefield {
     private TimeContainer time_container;
     private TimeContainer temp_time_container;
 
+    TLLRunnable tllRunnable;
+
+
+    public class TLLRunnable implements  Runnable{
+        TimeLinearLayout tll;
+        ScrollView sv;
+        TLLRunnable(TimeLinearLayout tll, ScrollView sv){
+            this.tll = tll;
+            this.sv = sv;
+        }
+        @Override
+        public void run(){
+            Log.d("TLLRUNABLE", "SCROLLING! getBottom:"+ tll.getBottom());
+            //
+            sv.scrollTo(0, tll.getBottom() );
+        }
+    }
+
     public void setTimeTemp(int milliseconds){
         temp_time_container.setMilliseconds(milliseconds);
     }
@@ -40,24 +61,28 @@ public class Timefield {
     }
 
 
-    public class CountdownOnClickListener implements View.OnClickListener {
+    public class CountdownOnTouchListener implements View.OnTouchListener {
         TimeContainer timeContainer;
         TimeLinearLayout timeLinearLayout;
         Timefield timefield;
-        public CountdownOnClickListener(TimeContainer timeContainer, TimeLinearLayout timeLinearLayout, Timefield timefield){
+        public CountdownOnTouchListener(TimeContainer timeContainer, TimeLinearLayout timeLinearLayout, Timefield timefield){
             this.timeContainer = timeContainer;
             this.timeLinearLayout = timeLinearLayout;
             this.timefield = timefield;
         }
         @Override
-        public void onClick(View view){
-            if(main_activity.getState() == MainStateGlobals.STATE_IDLE) {
-                GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
-                greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield, main_activity);
-                greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
-                timeLinearLayout.getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackgroundSelected));
-                ;
+        public boolean onTouch(View view, MotionEvent event){
+            switch (event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    if(main_activity.getState() == MainStateGlobals.STATE_IDLE) {
+                        GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
+                        greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield, main_activity);
+                        greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
+                        timeLinearLayout.getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackgroundSelected));
+                    }
+                    break;
             }
+            return true;
         }
     }
 
@@ -93,21 +118,27 @@ public class Timefield {
 
     void startTimefieldView(MainActivity activity){
         main_activity = activity;
-        static_index = main_activity.unique_index;
-        main_activity.unique_index++;
+        //main_activity.unique_index++;
 
         timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout.getTimeDraggable(), main_activity));
         timeLinearLayout.setOnDragListener(new GTOnDragListener(timeLinearLayout, main_activity, this));
 
+        tllRunnable = new TLLRunnable(timeLinearLayout, main_activity.getScrollView());
 
+        timeLinearLayout.getTimeDescription().setOnTouchListener(new DescriptionTouchEvent(this));
+
+    }
+
+    public void focusInScroll(){
+        timeLinearLayout.post(tllRunnable);
     }
 
     private void init(){
         timeLinearLayout = new TimeLinearLayout(context);
-        timeLinearLayout.setCountdownListener(new CountdownOnClickListener(time_container, timeLinearLayout, this));
+        timeLinearLayout.setCountdownListener(new CountdownOnTouchListener(time_container, timeLinearLayout, this));
         temp_time_container = new TimeContainer(time_container.getMilliseconds());
         timeLinearLayout.setPosition(index);
-
+        static_index = getIndex();
 
     }
 
