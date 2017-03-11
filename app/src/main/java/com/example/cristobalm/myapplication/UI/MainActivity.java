@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout et_list;
     boolean enabled_inputs;
     boolean mBound;
-    TimingService mService;
+    public TimingService mService;
 
     public int current_state;
     private int current_index;
@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     ThrashCan thrashCan;
 
     public int unique_index;
+
+
 
 
     public void pauseTimer(){
@@ -57,11 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void stopTimer(){
-        if(mService!=null) {
-            Intent intent = new Intent(this, TimingService.class);
-            mService.stopTimer();
-            stopService(intent);
-        }
+
         if(!isEnabled_inputs()) {
             enableInputs();
         }
@@ -92,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
         return current_index;
     }
 
+    public Timefield getTimefieldByUniqueID(int unique_id){
+        return map_timefields.get(unique_id);
+    }
+
     public void moveTimefield(int static_dest, int static_source){
         Timefield source = map_timefields.get(static_source);
         Timefield dest = map_timefields.get(static_dest);
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 ){
             time_fields.add(dest.getIndex(),
                     time_fields.remove(source.getIndex()));
+
             reloadList();
         }else{
             Toast.makeText(getApplicationContext(), "Some error occurred during dragging operation", Toast.LENGTH_LONG).show();
@@ -315,7 +318,11 @@ public class MainActivity extends AppCompatActivity {
             //time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().getBackground().clearColorFilter();
             time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(mService, R.color.colorCountdownBackground));
             time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().invalidate();
+            time_fields.get(i).setHint(i);
+            time_fields.get(i).enableInput();
+            time_fields.get(i).getTimeLinearLayout().getTimeDescription().invalidate();
         }
+        et_list.invalidate();
     }
 
     public void saveState(int state){

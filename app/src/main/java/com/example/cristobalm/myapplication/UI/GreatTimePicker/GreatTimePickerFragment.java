@@ -6,9 +6,11 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
@@ -31,23 +33,26 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
     }
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-        int hours = timeContainer.getHours();
-        int minutes = timeContainer.getMinutes();
-        int seconds = timeContainer.getSeconds();
-        Log.d("GTPickerFragment", "hours"+hours+", minutes:"+minutes+", seconds:"+seconds);
         greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), 0, this, timeContainer, mainActivity);
         greatTimePickerDialog.setTitle("Select time");
-        AlertDialog alert = greatTimePickerDialog.create();
 
-        return alert;
+        return greatTimePickerDialog.create();
     }
 
     @Override
     public void onTimeSet(GreatTimePicker view, TimeContainer timeContainer){
-        Log.d("onTimeSet", "setting time!");
 
         timeLinearLayout.setTime(timeContainer);
+        if(mainActivity != null && mainActivity.mService != null) {
+            mainActivity.mService.addSecondsToTotal((timeContainer.getMilliseconds() - timefield.getMilliseconds())/1000);
+        }
         timefield.setTime(timeContainer);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        timeLinearLayout.getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(mainActivity, R.color.colorCountdownBackground));
     }
 
     @Override

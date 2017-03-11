@@ -135,6 +135,7 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
         if(mCallback != null){
             greatTimePicker.clearFocus();
             mCallback.onTimeSet(greatTimePicker, greatTimePicker.getTimeContainer());
+
         }
     }
 

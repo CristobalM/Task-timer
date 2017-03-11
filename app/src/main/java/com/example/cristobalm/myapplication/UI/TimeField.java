@@ -1,12 +1,14 @@
 package com.example.cristobalm.myapplication.UI;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragOnClickListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTOnDragListener;
@@ -37,6 +39,7 @@ public class Timefield {
         time_container.setMilliseconds(t_container.getMilliseconds());
     }
 
+
     public class CountdownOnClickListener implements View.OnClickListener {
         TimeContainer timeContainer;
         TimeLinearLayout timeLinearLayout;
@@ -52,6 +55,8 @@ public class Timefield {
                 GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
                 greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield, main_activity);
                 greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
+                timeLinearLayout.getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackgroundSelected));
+                ;
             }
         }
     }
@@ -63,9 +68,12 @@ public class Timefield {
 
         init();
         Log.d("Timefield", "constructor.. index:"+ index);
-        this.timeLinearLayout.setDescription("Task " + String.valueOf(index+1));
+        this.timeLinearLayout.setHint(index+1);
         this.timeLinearLayout.setTime(0,0,0);
         startTimefieldView(main_activity);
+    }
+    public void setHint(int hint){
+        this.timeLinearLayout.setHint(hint+1);
     }
     public Timefield(Context context, int index, String custom_text, int milliseconds){
         this.context = context;
@@ -74,6 +82,7 @@ public class Timefield {
 
         time_container = new TimeContainer(milliseconds);
         init();
+        this.timeLinearLayout.setHint(index+1);
         this.timeLinearLayout.setDescription(custom_text);
         this.timeLinearLayout.setTime(
                 time_container.getHours(),

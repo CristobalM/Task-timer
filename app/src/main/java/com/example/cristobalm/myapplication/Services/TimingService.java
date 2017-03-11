@@ -30,7 +30,6 @@ import java.util.ArrayList;
 public class TimingService extends Service {
     private int mStartMode;
     private int current_state = MainStateGlobals.STATE_IDLE;
-    private ArrayList<Integer> times;
     private ArrayList<Timefield> time_fields;
     private int current_timer_index;
     AlarmManager alarmManager;
@@ -48,6 +47,8 @@ public class TimingService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
+    private Integer totalSeconds;
+
     public long getLastRemainingMillis(){
         return last_remaining_millis;
     }
@@ -55,6 +56,20 @@ public class TimingService extends Service {
         last_remaining_millis = _millis;
     }
 
+
+    public int getTotalSeconds(){
+        if(totalSeconds == null){
+            totalSeconds = 0;
+            for(int i = 0; i < time_fields.size(); i++){
+                totalSeconds += time_fields.get(i).getMilliseconds()/1000;
+            }
+        }
+        return totalSeconds;
+    }
+    public void addSecondsToTotal(int seconds){
+        getTotalSeconds();
+        totalSeconds += seconds;
+    }
 
     public StateStorage getStateStorage(){
         if(stateStorage == null) {
@@ -109,15 +124,7 @@ public class TimingService extends Service {
         current_state = state;
     }
 
-    public void setTimeList(ArrayList<Timefield> times){
-        this.time_fields = times;
-    }
-    private void reloadTimes(){
-        times = new ArrayList<>();
-        for(int i = 0; i < time_fields.size(); i++){
-            times.add(time_fields.get(i).getMilliseconds());
-        }
-    }
+
 
     @Override
     public IBinder onBind(Intent intent){
@@ -192,10 +199,12 @@ public class TimingService extends Service {
             timingNotifications.stopNotification(notification_id);
         }
         setMainState(MainStateGlobals.STATE_IDLE);
+        if (main_activity != null) {
+            main_activity.stopTimer();
+        }
     }
 
     public void startTimer(){
-        reloadTimes();
         current_timer_index = 0;
         setMainState(MainStateGlobals.STATE_RUNNING);
 
@@ -217,7 +226,7 @@ public class TimingService extends Service {
     private void continueTimer(){
         Log.d("continueTimer", "called continue timer! current_timer_index:" + current_timer_index);
         current_timer_index++;
-        if(current_timer_index >= times.size()){
+        if(current_timer_index >= time_fields.size()){
             // stop timer
             current_timer_index = 0;
             if(repeatState){
@@ -231,9 +240,7 @@ public class TimingService extends Service {
                         MainActivity.class,
                         "Finished all countdowns", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
                 stopTimer();
-                if (main_activity != null) {
-                    main_activity.stopTimer();
-                }
+
             }
         }
         else{
@@ -252,9 +259,8 @@ public class TimingService extends Service {
             to_add = from_pause_millis;
         }
         else{
-            to_add = times.get(current_timer_index);
+            to_add = time_fields.get(current_timer_index).getMilliseconds();
         }
-        Log.d("timerScheduling", "called timerScheduling!, time to do:"+times.get(current_timer_index));
         Intent intent = new Intent(getApplicationContext(), TimeReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
         nextMillis = System.currentTimeMillis() + to_add;
@@ -264,16 +270,14 @@ public class TimingService extends Service {
     }
 
     private String getTimeString(){
-        if(times != null && times.size() > current_timer_index) {
-            return TimeContainer.getTimeString(times.get(current_timer_index));
+        if(time_fields != null && time_fields.size() > current_timer_index) {
+            return TimeContainer.getTimeString(time_fields.get(current_timer_index).getMilliseconds());
         }
         else{
             return "--:--:--";
         }
     }
-    public TimeContainer getTimeContainer(){
-        return new TimeContainer(times.get(current_timer_index));
-    }
+
     public int getMillisecondsRemaining(){
         long currentmilis = System.currentTimeMillis();
         if(nextMillis > currentmilis){

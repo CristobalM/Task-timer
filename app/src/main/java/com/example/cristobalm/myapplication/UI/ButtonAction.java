@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
@@ -129,18 +130,28 @@ class ButtonAction {
         }
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
-        main_activity.stopTimer();
+        if(main_activity.mService!=null) {
+            Intent intent = new Intent(main_activity, TimingService.class);
+            main_activity.mService.stopTimer();
+            main_activity.stopService(intent);
+        }
 
         main_activity.getState();
 
 
     }
     private void onClickButtonPlay(){
-        if(main_activity.getState() == MainStateGlobals.STATE_RUNNING || main_activity.getTime_fields().size() <= 0){
+        if(main_activity.getState() == MainStateGlobals.STATE_RUNNING ||
+                main_activity.getTime_fields().size() <= 0){
+            return;
+        }
+        button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+
+        if(main_activity.mService.getTotalSeconds() <= 0){
+            Toast.makeText(main_activity, "Please, total time must be greater than zero", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
         switch (main_activity.getState()){
             case MainStateGlobals.STATE_PAUSED:
@@ -191,6 +202,7 @@ class ButtonAction {
 
     }
     private void onClickButtonRepeat(){
+        main_activity.reloadList();
         if(main_activity.mService == null){
             return;
         }

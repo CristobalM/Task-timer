@@ -13,6 +13,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -189,14 +191,30 @@ public class TimeLinearLayout extends LinearLayout {
         Log.d("tll_setDescription","setting description: "+ description);
         timeDescription.setText(description);
     }
+    public void setHint(int hint){
+        timeDescription.setHint("Task " + String.valueOf(hint));
+    }
 
     public void stopEditables(){
         timeDescription.setFocusable(false);
         timeCountdownView.setFocusable(false);
     }
 
+    
+
     public void enableEditables(){
+        timeDescription.setFocusable(true);
         timeDescription.setFocusableInTouchMode(true);
+        timeDescription.setClickable(true);
+        timeDescription.setSelectAllOnFocus(true);
+
+
+
+        if(timeDescription.getText()== null  || timeDescription.getText().toString()==""){
+            timeDescription.setText("");
+        }
+
+        //timeDescription.setEnabled(true);
         timeCountdownView.setFocusableInTouchMode(true);
     }
 

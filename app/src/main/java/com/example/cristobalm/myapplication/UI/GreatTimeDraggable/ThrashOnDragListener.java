@@ -45,7 +45,8 @@ public class ThrashOnDragListener implements View.OnDragListener {
                 ClipData.Item item = event.getClipData().getItemAt(0);
                 Intent intent = item.getIntent();
                 int result = intent.getIntExtra(GTDragOnClickListener.SOURCE_INDEX, -1);
-                //Toast.makeText(v.getContext(), "Source index is: " + result, Toast.LENGTH_SHORT).show();
+
+                mainActivity.mService.addSecondsToTotal(-mainActivity.getTimefieldByUniqueID(result).getMilliseconds());
                 mainActivity.removeTimeField(result);
                 v.invalidate();
                 return true;

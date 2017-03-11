@@ -11,6 +11,7 @@
     <color name="colorDescriptionBackground">#e4aa04</color>
     <color name="colorDraggable">#d8d508</color>
     <color name="colorCountdownBackground">#ed6e00</color>
+    <color name="colorCountdownBackgroundSelected">#ae5200</color>
 
 
 
