@@ -18,6 +18,7 @@ import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
  * Created by cristobalm on 3/4/17.
+ * Edit text for each item
  */
 
 public class TimeDescription extends AppCompatEditText {
@@ -80,10 +81,7 @@ public class TimeDescription extends AppCompatEditText {
     public boolean onDragEvent(DragEvent event){
         switch (event.getAction()){
             case DragEvent.ACTION_DRAG_STARTED:
-                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)){
-                    return true;
-                }
-                return false;
+                return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
             default:
                 return super.onDragEvent(event);
         }

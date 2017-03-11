@@ -29,7 +29,7 @@ class ButtonAction {
     private Context context;
     private MainActivity main_activity;
     private ImageView button;
-    ScrollView scrollView;
+    private ScrollView scrollView;
     ButtonAction(String button_name, MainActivity caller_instance, ImageView button){
         this.button_name = button_name;
         this.main_activity = caller_instance;
@@ -107,17 +107,17 @@ class ButtonAction {
         }
     }
 
-    public void stopUp(){
+    private void stopUp(){
         button.getBackground().clearColorFilter();
 
     }
-    public void playUp(){
+    private void playUp(){
         button.getBackground().clearColorFilter();
     }
-    public void pauseUp(){
+    private void pauseUp(){
         button.getBackground().clearColorFilter();
     }
-    public void addUp(){
+    private void addUp(){
         if(main_activity.getState() == MainStateGlobals.STATE_IDLE){
             button.getBackground().clearColorFilter();
         }
@@ -187,7 +187,7 @@ class ButtonAction {
 
         main_activity.map_timefields.put(static_index,time_f_single);
         et_list.addView(time_f_single.getLayout());
-        scrollView.fullScroll(scrollView.FOCUS_DOWN);
+        scrollView.fullScroll(View.FOCUS_DOWN);
 
     }
     private void onClickButtonRepeat(){

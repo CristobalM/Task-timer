@@ -15,6 +15,7 @@ import com.example.cristobalm.myapplication.UI.MainActivity;
 
 /**
  * Created by cristobalm on 3/7/17.
+ * Describes behaviour for dropping items in thrash can
  */
 
 
@@ -30,11 +31,7 @@ public class ThrashOnDragListener implements View.OnDragListener {
         final int action  = event.getAction();
         switch (action){
             case DragEvent.ACTION_DRAG_STARTED:
-                if(event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT) && mainActivity.current_state != MainStateGlobals.STATE_RUNNING) {
-
-                    return true;
-                }
-                return false;
+                return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT) && mainActivity.current_state != MainStateGlobals.STATE_RUNNING;
             case DragEvent.ACTION_DRAG_ENTERED:
                 thrashCan.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
                 return true;
