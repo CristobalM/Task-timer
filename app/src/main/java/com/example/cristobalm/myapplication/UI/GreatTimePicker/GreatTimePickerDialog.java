@@ -38,41 +38,21 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
     private final java.text.DateFormat dateFormat;
     private final Calendar mCalendar;
 
-    int initial_hours;
-    int initial_minutes;
-    int initial_seconds;
+    int millis;
 
-    private int hours;
-    private int minutes;
-    private int seconds;
 
-    MainActivity mainActivity;
 
     Button button_ok;
 
     public interface OnTimeSetListener{
-        void onTimeSet(GreatTimePicker view,TimeContainer timeContainer);
+        void onTimeSet(GreatTimePicker view,int millis);
     }
 
-    public GreatTimePickerDialog(Context context, OnTimeSetListener callback, int hours, int minutes, int seconds){
-        this(context, 0, callback, hours, minutes, seconds);
-    }
-    public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, TimeContainer timeContainer, MainActivity mainActivity){
-        this(context, 0, callback, timeContainer.getHours(), timeContainer.getMinutes(), timeContainer.getSeconds());
-        this.mainActivity = mainActivity;
-
-    }
-    public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, int hours, int minutes, int seconds){
+    public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, int millis){
         super(context, theme);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         mCallback = callback;
-        initial_hours = hours;
-        initial_minutes = minutes;
-        initial_seconds = seconds;
-        this.hours = hours;
-        this.minutes = minutes;
-        this.seconds = seconds;
 
         dateFormat = DateFormat.getTimeFormat(context);
         mCalendar = Calendar.getInstance();
@@ -85,13 +65,10 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
         this.setPositiveButton(R.string.ok, this);
 
 
-        greatTimePicker.setCurrentHours(initial_hours);
-        greatTimePicker.setCurrentMinutes(initial_minutes);
-        greatTimePicker.setCurrentSeconds(initial_seconds);
-        Log.d("GTPickerDialog",
-                "initial_hours:"+initial_hours+
-                ", initial_minutes:"+initial_minutes+
-                ", initial_seconds:"+initial_seconds);
+        greatTimePicker.setCurrentHours(TimeContainer.getHours(millis));
+        greatTimePicker.setCurrentMinutes(TimeContainer.getMinutes(millis));
+        greatTimePicker.setCurrentSeconds(TimeContainer.getSeconds(millis));
+
 
         greatTimePicker.setOnTimeChangedListener(this);
         Log.d("GreatTimePickerDialog", "set GreatTimePickerDialog as listener");
@@ -101,32 +78,11 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
 
     }
     @Override
-    public void onTimeChanged(GreatTimePicker view, int hours, int minutes, int seconds){
-        Log.d("OnTimeChanged","GreatTimePickerDialog: hours:"+hours+", minutes:"+minutes+", seconds:"+seconds);
-        this.hours = hours;
-        this.minutes = minutes;
-        this.seconds = seconds;
+    public void onTimeChanged(GreatTimePicker view, int millis){
+        //Log.d("OnTimeChanged","GreatTimePickerDialog: hours:"+hours+", minutes:"+minutes+", seconds:"+seconds);
+        this.millis = millis;
     }
 
-    public void updateTime(int hours, int minutes, int seconds){
-        greatTimePicker.setCurrentHours(hours);
-        greatTimePicker.setCurrentMinutes(minutes);
-        greatTimePicker.setCurrentSeconds(seconds);
-    }
-
-
-
-
-
-    public int getHours(){
-        return hours;
-    }
-    public int getMinutes(){
-        return minutes;
-    }
-    public int getSeconds(){
-        return seconds;
-    }
 
 
     @Override
@@ -134,7 +90,7 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
         Log.d("GTPickerDialog", "onClick, which:"+which);
         if(mCallback != null){
             greatTimePicker.clearFocus();
-            mCallback.onTimeSet(greatTimePicker, greatTimePicker.getTimeContainer());
+            mCallback.onTimeSet(greatTimePicker, greatTimePicker.getCurrentMillis());
 
         }
     }

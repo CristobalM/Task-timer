@@ -5,16 +5,26 @@ import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
+import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Timefield;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by cristobalm on 3/2/17.
@@ -30,11 +40,16 @@ public final class StateStorage {
     private String filename;
     private boolean fileExists;
 
+
     public StateStorage(Context context, String filename){
         this.context = context;
         this.filename = filename;
         fileHandling = new FileHandling(context);
         fileExists = fileHandling.fileExists(filename);
+    }
+    public StateStorage(Context context){
+        this.context = context;
+        fileHandling = new FileHandling(context);
     }
 
     private void storeStateIntoJSONFile(String keyname, Object data, int state){
@@ -150,8 +165,91 @@ public final class StateStorage {
             fileHandling.writeToFile(filename, storing_json_data);
         }
         catch(JSONException e){
-            Log.e("getRepeatState", "not found repeat state: " + e.getMessage() );
+            Log.e("saveRepeatState", "not found repeat state: " + e.getMessage() );
+        }
+    }
+    public void saveFileListNames(ArrayList<String> fileListNames){
+        String current_data = getFileJSONString();
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            JSONArray jsonArray = new JSONArray(Arrays.asList(fileListNames));
+
+            jsonObject.put(StateGlobals.LISTS_FILENAMES, jsonArray);
+            String storing_json_data = jsonObject.toString();
+            fileHandling.writeToFile(filename, storing_json_data);
+        }
+        catch(JSONException e){
+            Log.e("saveFileListNames", "ERROR : " + e.getMessage() );
+        }
+    }
+    public ArrayList<String> getFileListNames(){
+        String current_data = getFileJSONString();
+        ArrayList<String> fileListNames = null;
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            if(jsonObject.has(StateGlobals.LISTS_FILENAMES)){
+                JSONArray list =  jsonObject.getJSONArray(StateGlobals.LISTS_FILENAMES);
+                fileListNames = new ArrayList<>(list.length());
+                for(int i = 0; i < list.length(); i++){
+                    fileListNames.add(list.getString(i));
+                }
+            }
+        }
+        catch (JSONException e){
+            Log.e("getFileListNames", ".. " + e.getMessage() );
+        }
+        return fileListNames;
+    }
+
+    public Pair<Hashtable<Integer, Timefield>, Integer> getFileList(int index_file){
+        Pair<Hashtable<Integer, Timefield>, Integer> stored_data = null;
+        CSVReader csvReader;
+        try{
+            csvReader = new CSVReader(new FileReader(FilenameGlobals.LIST_SAVE(index_file)));
+            try {
+                List<String[]> parsedCSV = csvReader.readAll();
+                Hashtable<Integer, Timefield> map = new Hashtable<>();
+                int counter = 0;
+                for(String[] row : parsedCSV){
+                    Timefield timefield = new Timefield(context, counter, row[0], Integer.parseInt(row[1]));
+                    map.put(counter, timefield);
+                    counter++;
+                }
+                stored_data = new Pair<>(map, counter);
+            }
+            catch (IOException e){
+                Log.d("getFileList", "IOException reading csv!");
+            }
+        }
+        catch (FileNotFoundException e){
+            Log.d("getFileList", "File not found: "+ FilenameGlobals.LIST_SAVE(index_file));
+        }
+        return stored_data;
+    }
+
+    public void saveFileList(Pair<Hashtable<Integer, Timefield>, Integer> stored_data, int index_file){
+        Hashtable<Integer, Timefield> map = stored_data.first;
+        int items_quantity = stored_data.second;
+        CSVWriter csvWriter;
+
+        try {
+            csvWriter = new CSVWriter(new FileWriter(FilenameGlobals.LIST_SAVE(index_file)), CSVWriter.DEFAULT_SEPARATOR);
+            String [] entries = {CUSTOM_TEXT, MILLISECONDS};
+            //csvWriter.writeNext(entries);
+            ArrayList<String[]> list = new ArrayList<>();
+            list.add(entries);
+            for(int i = 0; i < items_quantity; i++){
+                String [] item_csv = {map.get(i).getCustomText(), String.valueOf(map.get(i).getMilliseconds())};
+                list.add(item_csv);
+            }
+            csvWriter.writeAll(list);
+            csvWriter.close();
+        }
+        catch (IOException e){
+            Log.e("saveFileList", "Error opening file: " + FilenameGlobals.LIST_SAVE(index_file));
         }
 
     }
+
+
 }

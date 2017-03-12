@@ -18,6 +18,7 @@ import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListItemInfo;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
@@ -35,7 +36,6 @@ import java.util.LinkedList;
 public class TimingService extends Service {
     private int mStartMode;
     private int current_state = MainStateGlobals.STATE_IDLE;
-    private LinkedList<Timefield> time_fields_init;
     private ArrayList<Integer> time_fields;
     private int current_timer_index;
     AlarmManager alarmManager;
@@ -45,6 +45,7 @@ public class TimingService extends Service {
     private MainActivity main_activity;
     StateStorage stateStorage;
     StateStorage configStates;
+    StateStorage listsData;
     ServiceCountdown serviceCountdown;
 
     Hashtable<Integer, Timefield> map_timefields;
@@ -58,12 +59,29 @@ public class TimingService extends Service {
 
     private Integer totalSeconds;
 
+    ArrayList<String> fileListNames;
+
+    ArrayList<ListItemInfo> listItemInfoArrayList;
+
+
+    //to stop or not to stop
+    boolean openingDialogDragment = false;
+    boolean waitingForScheduled = false;
+
+
+
+
+
+
     public Timefield getTFAt(int index){
-        return map_timefields.get(time_fields.get(index));
+        return retrieveMapTimefields().get(retrieveTimefields().get(index));
+    }
+    public Timefield getTFwithID(int static_id){
+        return retrieveMapTimefields().get(static_id);
     }
     public void addTimefield(Timefield timefield){
-        map_timefields.put(time_fields.size(), timefield);
-        time_fields.add(time_fields.size());
+        retrieveMapTimefields().put(retrieveTimefields().size(), timefield);
+        retrieveTimefields().add(retrieveTimefields().size());
     }
 
     public long getLastRemainingMillis(){
@@ -77,7 +95,7 @@ public class TimingService extends Service {
     public int getTotalSeconds(){
         if(totalSeconds == null){
             totalSeconds = 0;
-            for(int i = 0; i < time_fields.size(); i++){
+            for(int i = 0; i < retrieveTimefields().size(); i++){
                 totalSeconds += getTFAt(i).getMilliseconds()/1000;
             }
         }
@@ -86,6 +104,7 @@ public class TimingService extends Service {
     public void addSecondsToTotal(int seconds){
         getTotalSeconds();
         totalSeconds += seconds;
+        Log.d("addSecondsToTotal", "totalSeconds is = " + totalSeconds);
     }
 
     public StateStorage getStateStorage(){
@@ -100,6 +119,46 @@ public class TimingService extends Service {
         }
         return configStates;
     }
+
+    public StateStorage getListsData(){
+        if(listsData == null){
+            listsData = new StateStorage(getApplicationContext(), FilenameGlobals.CONFIG_STATES);
+        }
+        return listsData;
+    }
+
+    public ArrayList<String> getFileListNames(){
+        if(fileListNames == null){
+            fileListNames = getListsData().getFileListNames();
+        }
+        return fileListNames;
+    }
+
+    public void saveFileListNames(){
+        getListsData().saveFileListNames(fileListNames);
+    }
+
+    public ArrayList<ListItemInfo> builtListItemInfoArrayList (){
+        if(listItemInfoArrayList == null) {
+            ArrayList<String> f_list_names = getFileListNames();
+            if(f_list_names != null) {
+                listItemInfoArrayList = new ArrayList<>(f_list_names.size());
+                for (int i = 0; i < f_list_names.size(); i++) {
+                    ListItemInfo listItemInfo = new ListItemInfo(this);
+                    listItemInfo.setFile_name(f_list_names.get(i));
+
+                    listItemInfoArrayList.add(listItemInfo);
+                }
+            }else{
+                listItemInfoArrayList = new ArrayList<>();
+            }
+        }
+        return listItemInfoArrayList;
+    }
+
+
+
+
 
     public Hashtable<Integer, Timefield> retrieveMapTimefields(){
         if(map_timefields == null || time_fields == null) {
@@ -237,6 +296,32 @@ public class TimingService extends Service {
         if (main_activity != null) {
             main_activity.stopTimer();
         }
+
+    }
+
+    public void setOnOpeningDialogFragment(){
+        openingDialogDragment = true;
+    }
+    public void setOffOpeningDialogFragment(){
+        if(getMainState() == MainStateGlobals.STATE_IDLE){
+            setOffWaitingForScheduled();
+        }
+        openingDialogDragment = false;
+        if(!waitingForScheduled && !waitingForScheduled){
+            stopSelf();
+        }
+    }
+    public void setOnWaitingForScheduled(){
+        waitingForScheduled = true;
+    }
+    public void setOffWaitingForScheduled(){
+        if(main_activity == null){
+            setOffOpeningDialogFragment();
+        }
+        waitingForScheduled = false;
+        if(!waitingForScheduled && !waitingForScheduled){
+            stopSelf();
+        }
     }
 
     public void startTimer(){
@@ -244,6 +329,7 @@ public class TimingService extends Service {
         setMainState(MainStateGlobals.STATE_RUNNING);
 
         notification_id = 0;
+        setOnWaitingForScheduled();
 
         //timingNotifications.sendNotification(1, MainActivity.class,
         //        "Continuing on iteration #"+current_timer_index+
@@ -261,7 +347,7 @@ public class TimingService extends Service {
     private void continueTimer(){
         Log.d("continueTimer", "called continue timer! current_timer_index:" + current_timer_index);
         current_timer_index++;
-        if(current_timer_index >= time_fields.size()){
+        if(current_timer_index >= retrieveTimefields().size()){
             // stop timer
             current_timer_index = 0;
             if(repeatState){
@@ -275,6 +361,7 @@ public class TimingService extends Service {
                         MainActivity.class,
                         "Finished all countdowns", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
                 stopTimer();
+                setOffWaitingForScheduled();
 
             }
         }
@@ -305,7 +392,7 @@ public class TimingService extends Service {
     }
 
     private String getTimeString(){
-        if(time_fields != null && time_fields.size() > current_timer_index) {
+        if(retrieveTimefields() != null && retrieveTimefields().size() > current_timer_index) {
             return TimeContainer.getTimeString(getTFAt(current_timer_index).getMilliseconds());
         }
         else{

@@ -88,4 +88,8 @@ public class TimeContainer {
     public static final String getTimeString(int _millis){
         return String.format("%02d:%02d:%02d", getHours(_millis), getMinutes(_millis), getSeconds(_millis));
     }
+
+    public static final int getMillis(int hours, int minutes, int seconds){
+        return hours*60*60*1000 + minutes*60*1000 + seconds*1000;
+    }
 }

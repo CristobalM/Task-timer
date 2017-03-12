@@ -12,6 +12,7 @@
     <color name="colorDraggable">#d8d508</color>
     <color name="colorCountdownBackground">#ed6e00</color>
     <color name="colorCountdownBackgroundSelected">#ae5200</color>
+    <color name="transparent">#80000000</color>
 
 
 

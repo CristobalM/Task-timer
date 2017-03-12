@@ -16,6 +16,7 @@ public class InfoNameGlobals {
     public static final String STOP_TIMING = "STOP_TIMING";
     public static final String PAUSE_TIMING = "PAUSE_TIMING";
     public static final String CONTINUE_TIMING = "CONTINUE_TIMING";
+    public static final String KEEP_ON = "KEEP_ON";
 
     // Sound notifications
     public static final int NOTIFICATION_ONE = R.raw.tasktimer_notif_1;

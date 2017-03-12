@@ -11,4 +11,7 @@ public class StateGlobals {
 
     // repeat state
     public static final String REPEAT_STATE = "repeatState";
+
+    // filenames_list
+    public static final String LISTS_FILENAMES = "list_filenames";
 }

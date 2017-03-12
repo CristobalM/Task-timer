@@ -142,7 +142,6 @@ class ButtonAction {
         if(main_activity.mService!=null) {
             Intent intent = new Intent(main_activity, TimingService.class);
             main_activity.mService.stopTimer();
-            main_activity.stopService(intent);
         }
 
         main_activity.getState();

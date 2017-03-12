@@ -1,6 +1,7 @@
 package com.example.cristobalm.myapplication.UI;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -10,6 +11,8 @@ import android.widget.ScrollView;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
+import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragOnClickListener;
@@ -49,7 +52,7 @@ public class Timefield {
         public void run(){
             Log.d("TLLRUNABLE", "SCROLLING! getBottom:"+ tll.getBottom());
             //
-            sv.scrollTo(0, tll.getBottom() );
+            sv.scrollTo(0, tll.getTop() );
         }
     }
 
@@ -59,24 +62,28 @@ public class Timefield {
     public void setTime(TimeContainer t_container){
         time_container.setMilliseconds(t_container.getMilliseconds());
     }
+    public void setTime(int milliseconds){
+        time_container.setMilliseconds(milliseconds);
+    }
 
 
     public class CountdownOnTouchListener implements View.OnTouchListener {
-        TimeContainer timeContainer;
-        TimeLinearLayout timeLinearLayout;
-        Timefield timefield;
-        public CountdownOnTouchListener(TimeContainer timeContainer, TimeLinearLayout timeLinearLayout, Timefield timefield){
-            this.timeContainer = timeContainer;
-            this.timeLinearLayout = timeLinearLayout;
-            this.timefield = timefield;
+        int static_index;
+        MainActivity mainActivity;
+        public CountdownOnTouchListener(int static_index, MainActivity mainActivity){
+            this.static_index = static_index;
+            this.mainActivity = mainActivity;
         }
         @Override
         public boolean onTouch(View view, MotionEvent event){
             switch (event.getAction()){
                 case MotionEvent.ACTION_DOWN:
                     if(main_activity.getState() == MainStateGlobals.STATE_IDLE) {
-                        GreatTimePickerFragment greatTimePickerFragment = new GreatTimePickerFragment();
-                        greatTimePickerFragment.setInfo(timeLinearLayout, timeContainer, timefield, main_activity);
+                        main_activity.mService.setOnOpeningDialogFragment();
+                        Intent keep_service_on = new Intent(context, TimingService.class);
+                        keep_service_on.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.KEEP_ON);
+                        context.startService(keep_service_on);
+                        GreatTimePickerFragment greatTimePickerFragment = GreatTimePickerFragment.newInstance(static_index, mainActivity.mService);
                         greatTimePickerFragment.show(main_activity.getFragmentManager(), "timePicker");
                         timeLinearLayout.getTimeCountdownView().setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackgroundSelected));
                     }
@@ -88,6 +95,7 @@ public class Timefield {
 
     Timefield(Context context, int index, MainActivity main_activity){
         this.context = context;
+        main_activity = main_activity;
         setIndex(index);
         time_container = new TimeContainer(0);
 
@@ -127,6 +135,8 @@ public class Timefield {
 
         timeLinearLayout.getTimeDescription().setOnTouchListener(new DescriptionTouchEvent(this));
 
+        timeLinearLayout.setCountdownListener(new CountdownOnTouchListener(static_index, main_activity));
+
     }
 
     public void focusInScroll(){
@@ -134,11 +144,10 @@ public class Timefield {
     }
 
     private void init(){
+        static_index = getIndex();
         timeLinearLayout = new TimeLinearLayout(context);
-        timeLinearLayout.setCountdownListener(new CountdownOnTouchListener(time_container, timeLinearLayout, this));
         temp_time_container = new TimeContainer(time_container.getMilliseconds());
         timeLinearLayout.setPosition(index);
-        static_index = getIndex();
 
     }
 

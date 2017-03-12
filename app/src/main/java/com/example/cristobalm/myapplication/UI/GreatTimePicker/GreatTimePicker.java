@@ -32,7 +32,7 @@ public class GreatTimePicker extends FrameLayout {
 
 
     public interface OnTimeChangedListener{
-        void onTimeChanged(GreatTimePicker view, int hours, int minutes, int seconds);
+        void onTimeChanged(GreatTimePicker view, int millis);
     }
 
     public class GreatOnValueChangeListener implements NumberPicker.OnValueChangeListener{
@@ -62,8 +62,7 @@ public class GreatTimePicker extends FrameLayout {
 
     private static final OnTimeChangedListener NO_OP_CHANGE_LISTENER = new OnTimeChangedListener() {
         @Override
-        public void onTimeChanged(GreatTimePicker view, int hours, int minutes, int seconds) {
-            Log.d("donothing","donothingilstener: hours"+hours+", minutes:"+minutes+", seconds:"+seconds);
+        public void onTimeChanged(GreatTimePicker view, int millis) {
         }
     };
 
@@ -139,7 +138,7 @@ public class GreatTimePicker extends FrameLayout {
 
     private void onTimeChanged(){
         Log.d("su", "PrivadoOntimechanged in el picker hours:"+getCurrentHours()+", minutes:"+getCurrentMinutes()+", seconds:"+getCurrentSeconds());
-        mOnTimeChangedListener.onTimeChanged(this, getCurrentHours(), getCurrentMinutes(), getCurrentSeconds());
+        mOnTimeChangedListener.onTimeChanged(this, getCurrentMillis());
     }
 
     private void updateHoursDisplay(){
@@ -180,6 +179,9 @@ public class GreatTimePicker extends FrameLayout {
     }
     public TimeContainer getTimeContainer(){
         return new TimeContainer(currentHours, currentMinutes, currentSeconds);
+    }
+    public int getCurrentMillis(){
+        return TimeContainer.getMillis(currentHours, currentMinutes, currentSeconds);
     }
 
 }

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -28,6 +29,9 @@ import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListOnTouchListener;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListsLayout;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -52,6 +56,21 @@ public class MainActivity extends AppCompatActivity {
     public int unique_index;
 
     ScrollView scrollView;
+
+    ImageView listsButton;
+
+    ListsLayout listsLayout;
+
+    public ListsLayout getListsLayout(){
+        if(listsLayout == null){
+            listsLayout = new ListsLayout(this);
+        }
+        return listsLayout;
+    }
+
+
+
+
 
 
 
@@ -226,6 +245,12 @@ public class MainActivity extends AppCompatActivity {
         thrashCan = (ThrashCan)findViewById(R.id.thrash_can);
         thrashCan.setOnDragListener(new ThrashOnDragListener(this, thrashCan));
         thrashCan.setVisibility(View.INVISIBLE);
+
+
+        listsButton = (ImageView) findViewById(R.id.open_files);
+        listsButton.setOnTouchListener(new ListOnTouchListener(this));
+
+
     }
 
     @Override
