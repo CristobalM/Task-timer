@@ -118,11 +118,14 @@ class ButtonAction {
     }
 
     private void stopUp(){
-        button.getBackground().clearColorFilter();
+        //button.getBackground().clearColorFilter();
+        button.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
     }
     private void playUp(){
-        button.getBackground().clearColorFilter();
+        if(main_activity.time_fields.size()>0) {
+            button.getBackground().clearColorFilter();
+        }
     }
     private void pauseUp(){
         button.getBackground().clearColorFilter();
@@ -134,7 +137,7 @@ class ButtonAction {
     }
 
     private void onClickButtonStop(){
-        if(main_activity.getTime_fields().size() <= 0){
+        if(main_activity.getState() == MainStateGlobals.STATE_IDLE || main_activity.getTime_fields().size() <= 0){
             return;
         }
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
@@ -144,7 +147,7 @@ class ButtonAction {
             main_activity.mService.stopTimer();
         }
 
-        main_activity.getState();
+
 
 
     }
@@ -176,6 +179,7 @@ class ButtonAction {
 
         main_activity.blockInputs();
         main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE)).setVisibility(View.VISIBLE);
+        //main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         button.setVisibility(View.INVISIBLE);
         main_activity.getState();
     }
@@ -209,6 +213,9 @@ class ButtonAction {
         //scrollView.fullScroll(View.FOCUS_DOWN);
         //time_f_single.getLayout().requestFocus();
         scrollView.post(runnable);
+        if(time_fields.size() > 0){
+            main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().clearColorFilter();
+        }
 
     }
     private void onClickButtonRepeat(){

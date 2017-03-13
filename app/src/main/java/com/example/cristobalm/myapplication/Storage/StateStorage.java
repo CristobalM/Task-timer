@@ -203,7 +203,7 @@ public final class StateStorage {
         String current_data = getFileJSONString();
         try{
             JSONObject jsonObject = new JSONObject(current_data);
-            JSONArray jsonArray = new JSONArray(Arrays.asList(fileListNames));
+            JSONArray jsonArray = new JSONArray(fileListNames);
 
             jsonObject.put(StateGlobals.LISTS_FILENAMES, jsonArray);
             String storing_json_data = jsonObject.toString();

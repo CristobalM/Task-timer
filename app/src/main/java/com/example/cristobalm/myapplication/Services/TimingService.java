@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.util.Pair;
 import android.widget.LinearLayout;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
+import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
@@ -63,7 +65,6 @@ public class TimingService extends Service {
 
     ArrayList<ListItemInfo> listItemInfoArrayList;
 
-
     //to stop or not to stop
     boolean openingDialogDragment = false;
     boolean waitingForScheduled = false;
@@ -72,6 +73,66 @@ public class TimingService extends Service {
     Integer current_index_file;
 
 
+
+    int millis_editing = -1;
+
+    int to_load_file;
+
+    public void loadFile(int index_file){
+        to_load_file = index_file;
+    }
+    public void startFile(){
+        if(to_load_file == getCurrentIndexFile()){
+            return;
+        }
+        saveFile();
+        current_index_file = to_load_file;
+        getStateStorage().saveLastIndexFile(to_load_file);
+        map_timefields = null;
+        time_fields = null;
+        map_timefields = retrieveMapTimefields();
+        time_fields = retrieveTimefields();
+        if(main_activity != null){
+            main_activity.setTimefields(time_fields);
+            main_activity.setMapTimeFields(map_timefields);
+            //main_activity.reloadList();
+            main_activity.startTimeFieldsDisplay();
+            if(main_activity.getTitle_list() != null){
+                main_activity.getTitle_list().setHint(getTitleHint());
+                main_activity.getTitle_list().setText(getFileName(getCurrentIndexFile()));
+            }
+
+            main_activity.reloadButtonStates();
+
+        }
+    }
+
+    public void clearOtherBackground(){
+        if(listItemInfoArrayList != null && listItemInfoArrayList.size() > to_load_file){
+            ListItemInfo listItemInfo = listItemInfoArrayList.get(to_load_file);
+            listItemInfo.setBackgroundColor(R.color.colorDescriptionBackground);
+        }
+    }
+
+    public void setTitle(String title){
+        getFileListNames().set(getCurrentIndexFile(), title);
+        if(listItemInfoArrayList != null && listItemInfoArrayList.size() > getCurrentIndexFile()){
+            listItemInfoArrayList.get(getCurrentIndexFile()).setFile_name(title);
+        }
+    }
+    public String getTitle(){
+        return getFileName(getCurrentIndexFile());
+    }
+    public String getTitleHint(){
+        return "File "+(getCurrentIndexFile()+1) + " (Touch to edit)";
+    }
+
+    public int getMillisEditing(){
+        return millis_editing;
+    }
+    public void setMillisEditing(int _millis){
+        millis_editing = _millis;
+    }
 
 
 
@@ -132,6 +193,11 @@ public class TimingService extends Service {
     public ArrayList<String> getFileListNames(){
         if(fileListNames == null){
             fileListNames = getListsData().getFileListNames();
+            if(fileListNames == null){
+                fileListNames = new ArrayList<>();
+                fileListNames.add("");
+                saveFileListNames();
+            }
         }
         return fileListNames;
     }
@@ -146,8 +212,9 @@ public class TimingService extends Service {
             if(f_list_names != null) {
                 listItemInfoArrayList = new ArrayList<>(f_list_names.size());
                 for (int i = 0; i < f_list_names.size(); i++) {
-                    ListItemInfo listItemInfo = new ListItemInfo(this);
+                    ListItemInfo listItemInfo = new ListItemInfo(this, this, i);
                     listItemInfo.setFile_name(f_list_names.get(i));
+                    listItemInfo.setHint("File " + (i+1));
 
                     listItemInfoArrayList.add(listItemInfo);
                 }
@@ -159,6 +226,34 @@ public class TimingService extends Service {
     }
 
 
+    public void newFile(){
+        saveFile();
+        current_index_file = getFileListNames().size();
+        getStateStorage().saveLastIndexFile(current_index_file);
+        map_timefields = new Hashtable<>();
+        time_fields = new ArrayList<>();
+        saveFile();
+        fileListNames.add("");
+        if(main_activity != null){
+            main_activity.setTimefields(time_fields);
+            main_activity.setMapTimeFields(map_timefields);
+            main_activity.reloadList();
+            if(main_activity.getTitle_list() != null){
+                main_activity.getTitle_list().setHint(getTitleHint());
+                main_activity.getTitle_list().setText("");
+            }
+            main_activity.reloadButtonStates();
+
+        }
+        if(listItemInfoArrayList != null){
+            ListItemInfo listItemInfo = new ListItemInfo(this, this, getCurrentIndexFile());
+            listItemInfo.setFile_name("");
+            listItemInfo.setHint("File " + (getCurrentIndexFile()+1));
+            listItemInfoArrayList.add(listItemInfo);
+        }
+
+    }
+
 
     public void saveFile(){
         Log.d("saveFile", "saving data of index " + getCurrentIndexFile());
@@ -169,6 +264,14 @@ public class TimingService extends Service {
         if(current_index_file == null){
             Log.d("getCurrentIndexFile", "retrieving current index file");
             current_index_file = getStateStorage().getLastIndexFile();
+            if(getFileListNames().size() <= current_index_file || current_index_file < 0){
+                current_index_file = 0;
+                getStateStorage().saveLastIndexFile(0);
+                if(getFileListNames().size() == 0){
+                    fileListNames.add("");
+                    saveFileListNames();
+                }
+            }
         }else{
             Log.d("getCurrentIndexFile", "NOT retrieving current index file");
 
@@ -209,6 +312,14 @@ public class TimingService extends Service {
             retrieveMapTimefields();
         }
         return time_fields;
+    }
+
+    public String getFileName(int index_file){
+        String out = "";
+        if(getFileListNames().size() > index_file){
+            out = getFileListNames().get(index_file);
+        }
+        return out;
     }
 
 
@@ -289,6 +400,7 @@ public class TimingService extends Service {
         }
         //stopTimer();
         saveRepeatState();
+        saveFileListNames();
         Log.d("onDestroy", "destroyed service!!!!!!!!");
         super.onDestroy();
     }
@@ -405,12 +517,14 @@ public class TimingService extends Service {
 
     private void timerScheduling(long from_pause_millis){
         long to_add;
+        Timefield current_timefield= getTFAt(current_timer_index);
         if(from_pause_millis > -1){
             to_add = from_pause_millis;
         }
         else{
-            to_add =getTFAt(current_timer_index).getMilliseconds();
+            to_add =current_timefield.getMilliseconds();
         }
+        current_timefield.focusInScroll();
         Intent intent = new Intent(getApplicationContext(), TimeReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
         nextMillis = System.currentTimeMillis() + to_add;

@@ -46,6 +46,7 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
 
     public interface OnTimeSetListener{
         void onTimeSet(GreatTimePicker view,int millis);
+        void updateMillis(int millis);
     }
 
     public GreatTimePickerDialog(Context context, int theme, OnTimeSetListener callback, int millis){
@@ -81,8 +82,10 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
     public void onTimeChanged(GreatTimePicker view, int millis){
         //Log.d("OnTimeChanged","GreatTimePickerDialog: hours:"+hours+", minutes:"+minutes+", seconds:"+seconds);
         this.millis = millis;
+        if(mCallback != null){
+            mCallback.updateMillis(millis);
+        }
     }
-
 
 
     @Override

@@ -196,7 +196,7 @@ public class TimeLinearLayout extends LinearLayout {
         timeDescription.setText(description);
     }
     public void setHint(int hint){
-        timeDescription.setHint("Task " + String.valueOf(hint));
+        timeDescription.setHint("Task " + String.valueOf(hint) + " (Touch to edit)");
     }
 
     public void stopEditables(){

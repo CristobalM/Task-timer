@@ -47,6 +47,12 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
         mService = timingService;
     }
 
+    @Override
+    public void updateMillis(int millis){
+        if(mService != null){
+            mService.setMillisEditing(millis);
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -79,7 +85,7 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
         if(mService != null) {
             timefield = mService.getTFwithID(static_index);
             timeLinearLayout = timefield.getTimeLinearLayout();
-            millis = timefield.getMilliseconds();
+            millis = mService.getMillisEditing() > -1 ? mService.getMillisEditing() : timefield.getMilliseconds();
             Log.d("onCreateDialog","created dialog with service!");
 
         }
@@ -104,6 +110,7 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
             Log.d("onTimeSet", "mService is null!");
         }
         timefield.setTime(millis);
+        mService.setMillisEditing(-1);
         mService.setOffOpeningDialogFragment();
     }
     public void onCancel(DialogInterface dialog){

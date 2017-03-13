@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.Services.TimingService;
@@ -32,6 +33,8 @@ import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayou
 import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListOnTouchListener;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListsLayout;
+import com.example.cristobalm.myapplication.UI.ListFragment.NewFileOnTouchListener;
+import com.example.cristobalm.myapplication.UI.ListFragment.TitleChangeListener;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -57,9 +60,12 @@ public class MainActivity extends AppCompatActivity {
 
     ScrollView scrollView;
 
+    ImageView newFileButton;
     ImageView listsButton;
 
     ListsLayout listsLayout;
+
+    TextView title_list;
 
     public ListsLayout getListsLayout(){
         if(listsLayout == null){
@@ -68,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
         return listsLayout;
     }
 
-
+    public TextView getTitle_list(){
+        return title_list;
+    }
 
 
 
@@ -145,11 +153,10 @@ public class MainActivity extends AppCompatActivity {
                 ){
             time_fields.add(dest.getIndex(),
                     time_fields.remove(source.getIndex()));
-
+            reloadList();
         }else{
             Toast.makeText(getApplicationContext(), "Some error occurred during dragging operation", Toast.LENGTH_LONG).show();
         }
-        reloadList();
     }
     public void removeTimeField(int static_which){
         Log.d("removeTimeField", "Trying to delete Timefield with static index: "+ static_which);
@@ -247,10 +254,29 @@ public class MainActivity extends AppCompatActivity {
         thrashCan.setVisibility(View.INVISIBLE);
 
 
+        newFileButton = (ImageView) findViewById(R.id.new_file);
+        newFileButton.setOnTouchListener(new NewFileOnTouchListener(this));
+
         listsButton = (ImageView) findViewById(R.id.open_files);
         listsButton.setOnTouchListener(new ListOnTouchListener(this));
 
+        reloadButtonStates();
 
+
+        title_list = (TextView) findViewById(R.id.title_file);
+        title_list.setText(mService.getTitle());
+        title_list.addTextChangedListener(new TitleChangeListener(mService));
+        title_list.setHint(mService.getTitleHint());
+    }
+
+    public void reloadButtonStates(){
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+
+        if(time_fields.size() <= 0){
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        }else{
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().clearColorFilter();
+        }
     }
 
     @Override
@@ -288,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
             getTFAt(i).blockInput();
         }
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);  // setVisibility(View.INVISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().clearColorFilter();  // setVisibility(View.INVISIBLE);
         enabled_inputs = false;
 
     }
@@ -296,6 +323,8 @@ public class MainActivity extends AppCompatActivity {
             getTFAt(i).enableInput();
         }
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().clearColorFilter(); // .setVisibility(View.VISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+
         enabled_inputs = true;
     }
     public boolean isEnabled_inputs(){
@@ -303,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void startTimeFieldsDisplay(){
+    public void startTimeFieldsDisplay(){
         et_list.removeAllViews();
         et_list.invalidate();
         for (int i = 0; i < time_fields.size(); i++) {
@@ -362,13 +391,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void reloadList(){
         et_list.removeAllViews();
+        if(time_fields.size() <= 0) {
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        }
         for (int i = 0; i < time_fields.size(); i++) {
             Timefield selected_timefield = getTFAt(i);
             ViewParent parent = selected_timefield.getLayout().getParent();
             if(parent != null){
                 ((ViewGroup)parent).removeView(selected_timefield.getLayout());
             }
-            et_list.addView(selected_timefield.getLayout());
             selected_timefield.setIndex(i);
             selected_timefield.restoreTime();
             //time_fields.get(i).getTimeLinearLayout().getTimeCountdownView().getBackground().clearColorFilter();
@@ -377,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
             selected_timefield.setHint(i);
             selected_timefield.enableInput();
             selected_timefield.getTimeLinearLayout().getTimeDescription().invalidate();
-
+            et_list.addView(selected_timefield.getLayout());
         }
         et_list.invalidate();
     }

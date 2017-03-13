@@ -29,7 +29,7 @@
             android:textSize="15dp"
             android:background="@color/transparent_all"
             android:layout_centerVertical="true"
-            android:hint="Filename"
+            android:hint="Filename (Touch to edit)"
             />
 
     </RelativeLayout>

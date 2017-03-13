@@ -42,15 +42,10 @@ public class ListFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         ArrayList<ListItemInfo> list_items = timingService.builtListItemInfoArrayList();
-
-        if(list_items.size() <= 0) {
-            ListItemInfo listItemInfoTest = new ListItemInfo(getActivity());
-            listItemInfoTest.setFile_name("HOLA TE<st");
-            list_items.add(listItemInfoTest);
-        }
-
-
+        resetColors();
         ListDialog listDialog = new ListDialog(getActivity(), list_items, 0);
+        timingService.loadFile(timingService.getCurrentIndexFile());
+        listDialog.setPositiveButton(R.string.ok,  new OkButtonListener(timingService));
         AlertDialog to_return = listDialog.create();
         return to_return;
     }
@@ -58,9 +53,29 @@ public class ListFragment extends DialogFragment {
         timingService.setOffOpeningDialogFragment();
         super.onCancel(dialog);
     }
+    public void resetColors(){
+        ArrayList<ListItemInfo> list_items = timingService.builtListItemInfoArrayList();
+        if(list_items==null){
+            return;
+        }
+        for(int i = 0; i < list_items.size(); i++){
+            list_items.get(i).setBackgroundColor(R.color.colorDescriptionBackground);
+        }
+
+    }
 
     public void setInfo(TimingService timingService){
         this.timingService = timingService;
+    }
 
+    public class OkButtonListener implements DialogInterface.OnClickListener{
+        TimingService aService;
+        OkButtonListener(TimingService aService){
+            this.aService = aService;
+        }
+        @Override
+        public void onClick(DialogInterface dialogInterface, int which){
+            aService.startFile();
+        }
     }
 }

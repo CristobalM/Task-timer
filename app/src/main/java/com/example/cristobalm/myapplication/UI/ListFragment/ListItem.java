@@ -1,6 +1,8 @@
 package com.example.cristobalm.myapplication.UI.ListFragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -29,11 +31,29 @@ public class ListItem extends LinearLayout {
     ImageView delete_button;
     float scale;
 
+    public void setItemBackground(int color_src){
+        int color;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            color = context.getResources().getColor(color_src, null);
+        }
+        else{
+            color = context.getResources().getColor(color_src);
+        }
+        file_name.setBackgroundColor(color);
+        file_name.invalidate();
+
+    }
+
     public void setFile_name(String fileName){
         file_name.setText(fileName);
     }
     public String getFile_name(){
         return file_name.getText().toString();
+    }
+
+
+    public void setOpenerListener(OnTouchListener onTouchListener){
+        file_name.setOnTouchListener(onTouchListener);
     }
 
     public ListItem(Context context){
@@ -52,6 +72,10 @@ public class ListItem extends LinearLayout {
         this.context = context;
         this.attrs = attrs;
         init();
+    }
+
+    public void setHint(String hint){
+        file_name.setHint(hint);
     }
 
     Drawable getDrawableCompat(int resourceID){
