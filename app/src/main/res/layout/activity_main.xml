@@ -15,10 +15,21 @@
         android:id="@+id/custom_action_bar"
         >
         <ImageView
+            android:id="@+id/logo"
             android:layout_width="89dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_clocklogo_actionbar"
             android:layout_centerVertical="true"
+            />
+        <EditText
+            android:id="@+id/title_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/logo"
+            android:textSize="15dp"
+            android:background="@color/transparent_all"
+            android:layout_centerVertical="true"
+            android:hint="Filename"
             />
 
     </RelativeLayout>

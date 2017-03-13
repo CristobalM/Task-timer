@@ -14,4 +14,9 @@ public class StateGlobals {
 
     // filenames_list
     public static final String LISTS_FILENAMES = "list_filenames";
+
+    // index
+    public static final String CURRENT_INDEX = "current_index";
+
+
 }

@@ -13,6 +13,7 @@
     <color name="colorCountdownBackground">#ed6e00</color>
     <color name="colorCountdownBackgroundSelected">#ae5200</color>
     <color name="transparent">#80000000</color>
+    <color name="transparent_all">#00000000</color>
 
 
 

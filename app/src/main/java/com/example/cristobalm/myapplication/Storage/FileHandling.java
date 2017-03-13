@@ -43,7 +43,7 @@ final class FileHandling {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while((receiveString = bufferedReader.readLine()) != null){
-                    stringBuilder.append(receiveString);
+                    stringBuilder.append(receiveString+'\n');
                 }
                 inputStream.close();
                 ret = stringBuilder.toString();

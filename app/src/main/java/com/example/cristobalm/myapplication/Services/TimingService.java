@@ -69,6 +69,8 @@ public class TimingService extends Service {
     boolean waitingForScheduled = false;
 
 
+    Integer current_index_file;
+
 
 
 
@@ -158,12 +160,38 @@ public class TimingService extends Service {
 
 
 
+    public void saveFile(){
+        Log.d("saveFile", "saving data of index " + getCurrentIndexFile());
+        getStateStorage().saveFileList(toStoreCurrentData(), getCurrentIndexFile());
+    }
 
+    public int getCurrentIndexFile(){
+        if(current_index_file == null){
+            Log.d("getCurrentIndexFile", "retrieving current index file");
+            current_index_file = getStateStorage().getLastIndexFile();
+        }else{
+            Log.d("getCurrentIndexFile", "NOT retrieving current index file");
+
+        }
+        return current_index_file;
+    }
+
+    Pair<Hashtable<Integer, Timefield>, ArrayList<Integer>> toStoreCurrentData(){
+        return new Pair<>(retrieveMapTimefields(), retrieveTimefields());
+    }
 
     public Hashtable<Integer, Timefield> retrieveMapTimefields(){
         if(map_timefields == null || time_fields == null) {
+            int current_index = getCurrentIndexFile();
+            Log.d("retrieveMapTimefields", "current index is "+ current_index);
+            if (current_index == -1) {
+                getStateStorage().saveLastIndexFile(0);
+                current_index = 0;
+                Pair<Hashtable<Integer, Timefield>, ArrayList<Integer>> empty_stuff = new Pair<>(new Hashtable<Integer, Timefield>(), new ArrayList<Integer>());
+                getStateStorage().saveFileList(empty_stuff, current_index);
+            }
 
-            Pair<Hashtable<Integer, Timefield>, Integer> pair  = getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
+            Pair<Hashtable<Integer, Timefield>, Integer> pair = getStateStorage().getFileList(current_index);  //getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
             map_timefields = pair.first;
             int init_size = pair.second;
             time_fields = new ArrayList<>(init_size);

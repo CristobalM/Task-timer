@@ -383,9 +383,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void saveState(int state){
+        /*
         if(mService != null && mService.getStateStorage() != null && time_fields != null) {
             mService.getStateStorage().storeTimeFieldsList(time_fields, map_timefields, state);
             Log.d("saveState","Saving state #"+state);
+        }
+        */
+        if(mService != null){
+            mService.saveFile();
         }
     }
 

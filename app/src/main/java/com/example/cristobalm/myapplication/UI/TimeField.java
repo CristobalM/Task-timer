@@ -108,7 +108,7 @@ public class Timefield {
     public void setHint(int hint){
         this.timeLinearLayout.setHint(hint+1);
     }
-    public Timefield(Context context, int index, String custom_text, int milliseconds){
+    public  Timefield(Context context, int index, String custom_text, int milliseconds){
         this.context = context;
         setIndex(index);
         Log.d("Timefield", "secondconstructor.. index:"+index);

@@ -15,10 +15,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -168,6 +171,34 @@ public final class StateStorage {
             Log.e("saveRepeatState", "not found repeat state: " + e.getMessage() );
         }
     }
+    public void saveLastIndexFile(int index){
+        String current_data = getFileJSONString();
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            jsonObject.put(StateGlobals.CURRENT_INDEX, index);
+            String storing_json_data = jsonObject.toString();
+            fileHandling.writeToFile(filename, storing_json_data);
+        }
+        catch(JSONException e){
+            Log.e("saveLastIndexFile", ".." + e.getMessage() );
+        }
+    }
+    public int getLastIndexFile(){
+        String current_data = getFileJSONString();
+        int out = -1;
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            if(jsonObject.has(StateGlobals.CURRENT_INDEX)){
+                String index =  jsonObject.getString(StateGlobals.CURRENT_INDEX);
+                out = Integer.parseInt(index);
+            }
+        }
+        catch (JSONException e){
+            Log.e("getLastIndexFile", ".. " + e.getMessage() );
+        }
+        return out;
+    }
+
     public void saveFileListNames(ArrayList<String> fileListNames){
         String current_data = getFileJSONString();
         try{
@@ -204,51 +235,67 @@ public final class StateStorage {
     public Pair<Hashtable<Integer, Timefield>, Integer> getFileList(int index_file){
         Pair<Hashtable<Integer, Timefield>, Integer> stored_data = null;
         CSVReader csvReader;
-        try{
-            csvReader = new CSVReader(new FileReader(FilenameGlobals.LIST_SAVE(index_file)));
-            try {
-                List<String[]> parsedCSV = csvReader.readAll();
-                Hashtable<Integer, Timefield> map = new Hashtable<>();
-                int counter = 0;
-                for(String[] row : parsedCSV){
-                    Timefield timefield = new Timefield(context, counter, row[0], Integer.parseInt(row[1]));
+        String filename = FilenameGlobals.LIST_SAVE(index_file);
+        Log.d("getFileList", "reading file "+ filename);
+        String file_string = fileHandling.readFromFile(filename);
+        StringReader stringReader = new StringReader(file_string);
+        Log.d("getFileList", "STRING="+ file_string );
+        csvReader = new CSVReader(stringReader);
+        try {
+            List<String[]> parsedCSV = csvReader.readAll();
+            Hashtable<Integer, Timefield> map = new Hashtable<>();
+            int counter = 0;
+            boolean first = true;
+            for(String[] row : parsedCSV){
+                Log.d("getFileList", "counter: "+ counter + ", name:" + row[0] + ", millis:" + row[1]);
+                if(first){
+                    first = false;
+                }else {
+                    Log.d("getFileList", " row[1] is " + row[1]);
+                    int millis = row[1].length() > 0 ? Integer.parseInt(row[1]) : 0;
+                    Timefield timefield = new Timefield(context, counter, row[0], millis);
                     map.put(counter, timefield);
                     counter++;
                 }
-                stored_data = new Pair<>(map, counter);
             }
-            catch (IOException e){
-                Log.d("getFileList", "IOException reading csv!");
-            }
+            stored_data = new Pair<>(map, counter);
+
         }
-        catch (FileNotFoundException e){
-            Log.d("getFileList", "File not found: "+ FilenameGlobals.LIST_SAVE(index_file));
+        catch (IOException e){
+            Log.e("getFileList", "IOEXCEPTION!!!!");
         }
+
         return stored_data;
     }
 
-    public void saveFileList(Pair<Hashtable<Integer, Timefield>, Integer> stored_data, int index_file){
+    public void saveFileList(Pair<Hashtable<Integer, Timefield>, ArrayList<Integer>> stored_data, int index_file){
         Hashtable<Integer, Timefield> map = stored_data.first;
-        int items_quantity = stored_data.second;
-        CSVWriter csvWriter;
+        ArrayList<Integer> time_fields = stored_data.second;
 
+
+        String filename = FilenameGlobals.LIST_SAVE(index_file);
+        CSVWriter csvWriter;
+        //File file = new File(FilenameGlobals.LIST_SAVE(index_file)).getAbsolutePath();
+        StringWriter stringWriter = new StringWriter();
+        Log.d("saveFileList", "writing to file: " + FilenameGlobals.LIST_SAVE(index_file) + ", items_quantity:"+time_fields.size());
+        csvWriter = new CSVWriter(stringWriter);
+        String [] entries = {CUSTOM_TEXT, MILLISECONDS};
+        ArrayList<String[]> list = new ArrayList<>();
+        list.add(entries);
+        for(int i = 0; i < time_fields.size(); i++){
+            String [] item_csv = {map.get(time_fields.get(i)).getCustomText(), String.valueOf(map.get(time_fields.get(i)).getMilliseconds())};
+            list.add(item_csv);
+        }
+        //csvWriter.writeNext(entries);
+        csvWriter.writeAll(list);
         try {
-            csvWriter = new CSVWriter(new FileWriter(FilenameGlobals.LIST_SAVE(index_file)), CSVWriter.DEFAULT_SEPARATOR);
-            String [] entries = {CUSTOM_TEXT, MILLISECONDS};
-            //csvWriter.writeNext(entries);
-            ArrayList<String[]> list = new ArrayList<>();
-            list.add(entries);
-            for(int i = 0; i < items_quantity; i++){
-                String [] item_csv = {map.get(i).getCustomText(), String.valueOf(map.get(i).getMilliseconds())};
-                list.add(item_csv);
-            }
-            csvWriter.writeAll(list);
             csvWriter.close();
         }
         catch (IOException e){
-            Log.e("saveFileList", "Error opening file: " + FilenameGlobals.LIST_SAVE(index_file));
+            Log.e("saveFileList", "Error saving file: " + FilenameGlobals.LIST_SAVE(index_file));
         }
-
+        String to_store_string = stringWriter.toString();
+        fileHandling.writeToFile(filename, to_store_string);
     }
 
 
