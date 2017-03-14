@@ -61,4 +61,10 @@ final class FileHandling {
         File file = context.getFileStreamPath(filename);
         return file.exists();
     }
+    public void deleteFile(String filename){
+        File file = context.getFileStreamPath(filename);
+        if(file.exists()) {
+            context.deleteFile(filename);
+        }
+    }
 }

@@ -182,6 +182,7 @@ class ButtonAction {
         //main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         button.setVisibility(View.INVISIBLE);
         main_activity.getState();
+        main_activity.saveState();
     }
     private void onClickButtonPause(){
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
@@ -216,6 +217,7 @@ class ButtonAction {
         if(time_fields.size() > 0){
             main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().clearColorFilter();
         }
+
 
     }
     private void onClickButtonRepeat(){

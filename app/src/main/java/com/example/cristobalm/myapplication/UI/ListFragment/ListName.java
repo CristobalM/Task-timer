@@ -65,7 +65,7 @@ public class ListName extends AppCompatTextView {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize - VisualSettingGlobals.getPixels(30,scale), height);
+        setMeasuredDimension(widthSize - VisualSettingGlobals.getPixels(40,scale), height);
     }
 
 }

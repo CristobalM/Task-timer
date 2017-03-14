@@ -1,17 +1,24 @@
 package com.example.cristobalm.myapplication.Services;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
@@ -20,6 +27,8 @@ import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListDialog;
+import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListItemInfo;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
@@ -61,7 +70,6 @@ public class TimingService extends Service {
 
     private Integer totalSeconds;
 
-    ArrayList<String> fileListNames;
 
     ArrayList<ListItemInfo> listItemInfoArrayList;
 
@@ -82,9 +90,13 @@ public class TimingService extends Service {
         to_load_file = index_file;
     }
     public void startFile(){
+        //clearOtherBackground();
+        Log.e("startFile", "trying to open file with id "+ to_load_file + ", currentindexfile: " + getCurrentIndexFile());
         if(to_load_file == getCurrentIndexFile()){
             return;
         }
+        totalSeconds = null;
+
         saveFile();
         current_index_file = to_load_file;
         getStateStorage().saveLastIndexFile(to_load_file);
@@ -103,28 +115,21 @@ public class TimingService extends Service {
             }
 
             main_activity.reloadButtonStates();
-
-        }
-    }
-
-    public void clearOtherBackground(){
-        if(listItemInfoArrayList != null && listItemInfoArrayList.size() > to_load_file){
-            ListItemInfo listItemInfo = listItemInfoArrayList.get(to_load_file);
-            listItemInfo.setBackgroundColor(R.color.colorDescriptionBackground);
         }
     }
 
     public void setTitle(String title){
-        getFileListNames().set(getCurrentIndexFile(), title);
-        if(listItemInfoArrayList != null && listItemInfoArrayList.size() > getCurrentIndexFile()){
-            listItemInfoArrayList.get(getCurrentIndexFile()).setFile_name(title);
+        getFileNamesMap().put(getCurrentIndexFile(), title);
+        if(listItemInfoArrayList != null && listItemInfoArrayList.size() > getIDorder(getCurrentIndexFile())){
+            listItemInfoArrayList.get(getIDorder(getCurrentIndexFile())).setFile_name(title);
         }
     }
     public String getTitle(){
         return getFileName(getCurrentIndexFile());
     }
     public String getTitleHint(){
-        return "File "+(getCurrentIndexFile()+1) + " (Touch to edit)";
+        Log.e("getTitleHint", "current index file: " + getCurrentIndexFile());
+        return "File "+(getIDorder(getCurrentIndexFile())+1) + " (Touch to edit)";
     }
 
     public int getMillisEditing(){
@@ -183,37 +188,130 @@ public class TimingService extends Service {
         return configStates;
     }
 
-    public StateStorage getListsData(){
-        if(listsData == null){
-            listsData = new StateStorage(getApplicationContext(), FilenameGlobals.CONFIG_STATES);
-        }
-        return listsData;
-    }
 
-    public ArrayList<String> getFileListNames(){
-        if(fileListNames == null){
-            fileListNames = getListsData().getFileListNames();
-            if(fileListNames == null){
-                fileListNames = new ArrayList<>();
-                fileListNames.add("");
-                saveFileListNames();
+    ArrayList<Integer> fileListIDS;
+    public ArrayList<Integer> getFileListIDS(){
+        if(fileListIDS == null){
+            fileListIDS = getConfigStates().getFileListIDS();
+            if(fileListIDS == null){
+                fileListIDS = new ArrayList<>();
             }
         }
-        return fileListNames;
+        return fileListIDS;
+    }
+    Hashtable<Integer, String> fileNamesMap;
+    public Hashtable<Integer, String> getFileNamesMap(){
+        if(fileNamesMap == null){
+            fileNamesMap = getConfigStates().getFileNamesMap(getFileListIDS());
+            if(fileNamesMap.get(0) == null){
+                fileNamesMap.put(0, "");
+            }
+        }
+        return fileNamesMap;
     }
 
-    public void saveFileListNames(){
-        getListsData().saveFileListNames(fileListNames);
+    public void reloadItemsInList(){
+        getFilesDialogList().removeAllViewsInLayout();
+        //getFilesDialogList().requestLayout();
+        getFilesDialogList().removeAllViews();
+        getFilesDialogList().invalidate();
+        getFilesDialogList().postInvalidate();
+        getFilesDialogList().requestLayout();
+            getFilesDialogList().refreshDrawableState();
+        getFilesDialogList().destroyDrawingCache();
+        for(int i = 0; i < builtListItemInfoArrayList().size(); i++){
+            ListItemInfo _lIF = builtListItemInfoArrayList().get(i);
+            if(_lIF.getListItem().getParent() != null){
+                ((ViewGroup) _lIF.getListItem().getParent()).removeView(_lIF.getListItem());
+            }
+            getFilesDialogList().addView(_lIF.getListItem());
+        }
+        getFilesDialogList().invalidate();
+        //getFilesDialogList().postInvalidate();
     }
+
+    public void reloadColor(){
+        for(int i = 0; i < builtListItemInfoArrayList().size(); i++){
+            ListItemInfo _lIF = builtListItemInfoArrayList().get(i);
+            _lIF.setBackgroundColor(R.color.itemNotificationBackground);
+        }
+    }
+
+    public void removeID(int id){
+        if(id == getCurrentIndexFile()){
+            Toast.makeText(main_activity, "Please open other file first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.e("removeID", "id:"+ id + " order:" + getIDorder(id)+ ", arrayinfosize:"+ builtListItemInfoArrayList().size());
+        reloadOrder();
+        getFilesDialogList().removeView(builtListItemInfoArrayList().get(getIDorder(id)).getListItem());
+        //builtListItemInfoArrayList().remove(getIDorder(id));
+        listItemInfoArrayList = null;
+
+        getFileListIDS().remove(((int)getIDorder(id)));
+        reloadOrder();
+        getFileNamesMap().remove(id);
+        deleteFile(id);
+        reloadItemsInList();
+        getFilesDialogList().invalidate();
+
+
+        if(main_activity != null){
+            main_activity.reloadCurrentTitle();
+        }
+
+    }
+
+    ArrayList<Integer> bulk_delete;
+
+    public void deleteFile(int id){
+        if(bulk_delete == null){
+            bulk_delete = new ArrayList<>();
+        }
+        bulk_delete.add(id);
+    }
+    public void bulkDelete(){
+        if(bulk_delete != null){
+            getConfigStates().deleteFiles(bulk_delete);
+        }
+    }
+
+    public void reloadOrder(){
+        String order_show_debug = "";
+        for(int i = 0; i < getFileListIDS().size(); i++){
+            setIDorder(getFileListIDS().get(i), i);
+            order_show_debug += "id:"+getFileListIDS().get(i)+",order:"+i+";";
+        }
+        Log.e("reloadOrder", order_show_debug);
+    }
+
+    LinearLayout filesDialogList;
+
+    public LinearLayout getFilesDialogList(){
+        return filesDialogList;
+    }
+
+    public void setFilesDialogList(LinearLayout ll){
+        filesDialogList = ll;
+    }
+
+    RelativeLayout sugran;
+    public boolean is_set = false;
+
+
+
 
     public ArrayList<ListItemInfo> builtListItemInfoArrayList (){
         if(listItemInfoArrayList == null) {
-            ArrayList<String> f_list_names = getFileListNames();
-            if(f_list_names != null) {
-                listItemInfoArrayList = new ArrayList<>(f_list_names.size());
-                for (int i = 0; i < f_list_names.size(); i++) {
-                    ListItemInfo listItemInfo = new ListItemInfo(this, this, i);
-                    listItemInfo.setFile_name(f_list_names.get(i));
+            ArrayList<Integer> f_list_ids = getFileListIDS();
+            if(f_list_ids != null) {
+                listItemInfoArrayList = new ArrayList<>(f_list_ids.size());
+                for (int i = 0; i < f_list_ids.size(); i++) {
+                    ListItemInfo listItemInfo = new ListItemInfo(this, this, f_list_ids.get(i));
+                    String filename = getFileNamesMap().get(f_list_ids.get(i));
+                    if(filename != null) {
+                        listItemInfo.setFile_name(filename);
+                    }
                     listItemInfo.setHint("File " + (i+1));
 
                     listItemInfoArrayList.add(listItemInfo);
@@ -224,16 +322,43 @@ public class TimingService extends Service {
         }
         return listItemInfoArrayList;
     }
+    Integer unique_id;
+    public int getUniqueID(){
+        if(unique_id == null){
+            unique_id = getConfigStates().getUniqueID();
+        }
+        return unique_id;
+    }
+    public int nextUniqueID(){
+        int out = getUniqueID();
+        unique_id = out+1;
+        return out;
+    }
+    public void saveUniqueID(){
+        getConfigStates().saveUniqueID(getUniqueID());
+    }
 
+    public void saveAll(){
+        saveFile();
+        saveUniqueID();
+        saveMapAndList();
+    }
+    public void saveMapAndList(){
+        getConfigStates().saveListAndMapFiles(getFileNamesMap(), getFileListIDS());
+    }
 
     public void newFile(){
         saveFile();
-        current_index_file = getFileListNames().size();
+        totalSeconds=null;
+        current_index_file = nextUniqueID();
+
+        Log.e("UNIQUE_IDIS", ":" + current_index_file);
         getStateStorage().saveLastIndexFile(current_index_file);
         map_timefields = new Hashtable<>();
         time_fields = new ArrayList<>();
         saveFile();
-        fileListNames.add("");
+        setIDorder(current_index_file, getFileListIDS().size());
+        getFileListIDS().add(current_index_file);
         if(main_activity != null){
             main_activity.setTimefields(time_fields);
             main_activity.setMapTimeFields(map_timefields);
@@ -245,14 +370,15 @@ public class TimingService extends Service {
             main_activity.reloadButtonStates();
 
         }
-        if(listItemInfoArrayList != null){
-            ListItemInfo listItemInfo = new ListItemInfo(this, this, getCurrentIndexFile());
-            listItemInfo.setFile_name("");
-            listItemInfo.setHint("File " + (getCurrentIndexFile()+1));
-            listItemInfoArrayList.add(listItemInfo);
-        }
-
+        listItemInfoArrayList = null;
+        /*
+        ListItemInfo listItemInfo = new ListItemInfo(this, this, getCurrentIndexFile());
+        listItemInfo.setFile_name("");
+        listItemInfo.setHint("File " + (getIDorder(getCurrentIndexFile())+1));
+        builtListItemInfoArrayList().add(listItemInfo);
+        */
     }
+
 
 
     public void saveFile(){
@@ -264,13 +390,13 @@ public class TimingService extends Service {
         if(current_index_file == null){
             Log.d("getCurrentIndexFile", "retrieving current index file");
             current_index_file = getStateStorage().getLastIndexFile();
-            if(getFileListNames().size() <= current_index_file || current_index_file < 0){
-                current_index_file = 0;
-                getStateStorage().saveLastIndexFile(0);
-                if(getFileListNames().size() == 0){
-                    fileListNames.add("");
-                    saveFileListNames();
+            if(current_index_file < 0 || getIDorder(current_index_file) == null ||getFileListIDS().size() <= getIDorder(current_index_file)){
+                current_index_file = getFileListIDS().size() > 0 ? getFileListIDS().get(0) : 0;
+                if(getFileListIDS().size() == 0){
+                    current_index_file = nextUniqueID();
+                    getFileListIDS().add(current_index_file);
                 }
+                getStateStorage().saveLastIndexFile(current_index_file);
             }
         }else{
             Log.d("getCurrentIndexFile", "NOT retrieving current index file");
@@ -283,15 +409,35 @@ public class TimingService extends Service {
         return new Pair<>(retrieveMapTimefields(), retrieveTimefields());
     }
 
+    Hashtable<Integer, Integer> id_order;
+
+    public Hashtable<Integer, Integer> getOrderMap(){
+        if(id_order == null){
+            id_order = new Hashtable<>();
+            for(int i = 0; i < getFileListIDS().size(); i++){
+                id_order.put(getFileListIDS().get(i), i);
+            }
+        }
+        return id_order;
+    }
+
+    public Integer getIDorder(int id){
+        return getOrderMap().get(id);
+    }
+    public void setIDorder(int id, int order){
+        getOrderMap().put(id, order);
+    }
+
     public Hashtable<Integer, Timefield> retrieveMapTimefields(){
         if(map_timefields == null || time_fields == null) {
             int current_index = getCurrentIndexFile();
             Log.d("retrieveMapTimefields", "current index is "+ current_index);
             if (current_index == -1) {
-                getStateStorage().saveLastIndexFile(0);
-                current_index = 0;
+                current_index = getUniqueID();
+                getStateStorage().saveLastIndexFile(current_index);
                 Pair<Hashtable<Integer, Timefield>, ArrayList<Integer>> empty_stuff = new Pair<>(new Hashtable<Integer, Timefield>(), new ArrayList<Integer>());
                 getStateStorage().saveFileList(empty_stuff, current_index);
+
             }
 
             Pair<Hashtable<Integer, Timefield>, Integer> pair = getStateStorage().getFileList(current_index);  //getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
@@ -316,10 +462,8 @@ public class TimingService extends Service {
 
     public String getFileName(int index_file){
         String out = "";
-        if(getFileListNames().size() > index_file){
-            out = getFileListNames().get(index_file);
-        }
-        return out;
+        String fname = getFileNamesMap().get(index_file);
+        return (fname != null) ? fname : out;
     }
 
 
@@ -400,7 +544,8 @@ public class TimingService extends Service {
         }
         //stopTimer();
         saveRepeatState();
-        saveFileListNames();
+        saveAll();
+        bulkDelete();
         Log.d("onDestroy", "destroyed service!!!!!!!!");
         super.onDestroy();
     }
@@ -517,7 +662,7 @@ public class TimingService extends Service {
 
     private void timerScheduling(long from_pause_millis){
         long to_add;
-        Timefield current_timefield= getTFAt(current_timer_index);
+        Timefield current_timefield = getTFAt(current_timer_index);
         if(from_pause_millis > -1){
             to_add = from_pause_millis;
         }
@@ -532,7 +677,6 @@ public class TimingService extends Service {
         alarmManager.set(AlarmManager.RTC_WAKEUP, nextMillis, pendingIntent);
         serviceCountdown.startNewCountDown(getTFAt(current_timer_index), this);
     }
-
     private String getTimeString(){
         if(retrieveTimefields() != null && retrieveTimefields().size() > current_timer_index) {
             return TimeContainer.getTimeString(getTFAt(current_timer_index).getMilliseconds());

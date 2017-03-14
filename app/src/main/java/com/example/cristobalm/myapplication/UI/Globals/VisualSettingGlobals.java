@@ -2,6 +2,7 @@ package com.example.cristobalm.myapplication.UI.Globals;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 
 import com.example.cristobalm.myapplication.UI.MainActivity;
 
@@ -39,7 +40,17 @@ public class VisualSettingGlobals {
             }
             return tf;
         }
+    }
 
+    public static int getColor(int color_src, Context context){
+        int color;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            color = context.getResources().getColor(color_src, null);
+        }
+        else{
+            color = context.getResources().getColor(color_src);
+        }
+        return color;
     }
 
 

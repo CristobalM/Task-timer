@@ -2,6 +2,11 @@ package com.example.cristobalm.myapplication.UI.ListFragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -31,17 +36,30 @@ public class ListItem extends LinearLayout {
     ImageView delete_button;
     float scale;
 
-    public void setItemBackground(int color_src){
-        int color;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            color = context.getResources().getColor(color_src, null);
-        }
-        else{
-            color = context.getResources().getColor(color_src);
-        }
-        file_name.setBackgroundColor(color);
-        file_name.invalidate();
+    Paint paint = new Paint();
+    Path path = new Path();
 
+    int height;
+
+    int delete_button_width;
+    public void OnDeleteColor(){
+        delete_button.setColorFilter(Color.BLUE);
+    }
+    public void OffDeleteColor(){
+        delete_button.clearColorFilter();
+    }
+
+
+    public void setItemBackground(int color_src){
+        file_name.setBackgroundColor(getColor(color_src));
+        file_name.invalidate();
+    }
+    public void setItemTextColor(int color_src){
+        file_name.setTextColor(getColor(color_src));
+        file_name.setHintTextColor(getColor(color_src));
+    }
+    public int getColor(int color_src){
+        return VisualSettingGlobals.getColor(color_src, context);
     }
 
     public void setFile_name(String fileName){
@@ -54,6 +72,9 @@ public class ListItem extends LinearLayout {
 
     public void setOpenerListener(OnTouchListener onTouchListener){
         file_name.setOnTouchListener(onTouchListener);
+    }
+    public void setDeleteListener(OnTouchListener onTouchListener){
+        delete_button.setOnTouchListener(onTouchListener);
     }
 
     public ListItem(Context context){
@@ -94,9 +115,11 @@ public class ListItem extends LinearLayout {
         //edit_button = new ImageView(context);
         delete_button = new ImageView(context);
 
-        int delete_button_width = VisualSettingGlobals.getPixels(30, scale);
+        delete_button_width = VisualSettingGlobals.getPixels(40, scale);
 
-        LayoutParams my_params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        height = VisualSettingGlobals.getPixels(50, scale);
+
+        LayoutParams my_params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height ); //ViewGroup.LayoutParams.WRAP_CONTENT);
         LayoutParams file_name_params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         //LayoutParams edit_button_params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         LayoutParams delete_button_params = new LayoutParams(delete_button_width, delete_button_width);
@@ -105,6 +128,8 @@ public class ListItem extends LinearLayout {
 
         //edit_button.setImageDrawable();
         delete_button.setImageDrawable(delete_button_drawable);
+        delete_button.setPadding(VisualSettingGlobals.getPixels(5,scale), 0,0,0);
+
 
         //edit_button.setLayoutParams(edit_button_params);
 
@@ -125,6 +150,8 @@ public class ListItem extends LinearLayout {
 
 
 
+        int bottom_margin = VisualSettingGlobals.getPixels(1, scale);
+        //my_params.setMargins(0,0,0,bottom_margin);
 
 
 
@@ -135,6 +162,32 @@ public class ListItem extends LinearLayout {
 
         this.setLayoutParams(my_params);
         this.invalidate();
+
+
+        paint.setColor(Color.BLACK);
+        paint.setStrokeWidth(3);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setARGB(255, 0, 0, 0);
+        paint.setPathEffect(new DashPathEffect(new float[]{1,2}, 0));
+
+        setWillNotDraw(false);
+
+
+
+
+    }
+
+
+    @Override
+    protected void onDraw(Canvas canvas){
+        path.moveTo(0,0);
+        path.lineTo(getMeasuredWidth()-delete_button_width, 0);
+
+
+
+        canvas.drawPath(path, paint);
+        super.onDraw(canvas);
+
     }
 
 

@@ -261,8 +261,11 @@ public class MainActivity extends AppCompatActivity {
         listsButton.setOnTouchListener(new ListOnTouchListener(this));
 
         reloadButtonStates();
+        reloadCurrentTitle();
 
+    }
 
+    public void reloadCurrentTitle(){
         title_list = (TextView) findViewById(R.id.title_file);
         title_list.setText(mService.getTitle());
         title_list.addTextChangedListener(new TitleChangeListener(mService));
@@ -299,13 +302,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
-        saveState(StateGlobals.SAVE_STATE);
+        saveState();
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy(){
-        saveState(StateGlobals.SAVE_STATE);
+        saveState();
+
+
         super.onDestroy();
     }
 
@@ -413,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
         et_list.invalidate();
     }
 
-    public void saveState(int state){
+    public void saveState(){
         /*
         if(mService != null && mService.getStateStorage() != null && time_fields != null) {
             mService.getStateStorage().storeTimeFieldsList(time_fields, map_timefields, state);
@@ -421,7 +426,8 @@ public class MainActivity extends AppCompatActivity {
         }
         */
         if(mService != null){
-            mService.saveFile();
+            //mService.saveFile();
+            mService.saveAll();
         }
     }
 

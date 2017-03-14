@@ -26,21 +26,16 @@ public class ListOnTouchListener implements View.OnTouchListener {
         switch (e.getAction()){
             case MotionEvent.ACTION_DOWN:
                 if(mainActivity.getState() == MainStateGlobals.STATE_IDLE && mainActivity.mService != null) {
-                    ListFragment listFragment = ListFragment.newInstance(mainActivity.mService);
+                    ListFragment listFragment = ListFragment.newInstance(
+                            mainActivity.mService,
+                            mainActivity.mService.builtListItemInfoArrayList());
 
-                    /*
-                    ArrayList<ListItemInfo> suL =  mainActivity.mService.builtListItemInfoArrayList();
-                    if(suL.size() <= 0) {
-                        ListItemInfo listItemInfoTest = new ListItemInfo(mainActivity);
-                        listItemInfoTest.setFile_name("HOLA TE<st");
-                        suL.add(listItemInfoTest);
-                    }
-                    */
 
                     Intent keep_service_on = new Intent(mainActivity, TimingService.class);
                     keep_service_on.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.KEEP_ON);
                     mainActivity.startService(keep_service_on);
-                    listFragment.setInfo(mainActivity.mService);
+                    //listFragment.setInfo(mainActivity.mService, );
+
                     listFragment.show(mainActivity.getFragmentManager(), "listItem");
                 }
                 break;

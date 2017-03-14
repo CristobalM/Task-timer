@@ -10,26 +10,36 @@
     >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/gradient_action_bar"
         android:id="@+id/custom_action_bar"
         >
+        <!--
+        <TextView
+            android:id="@+id/ads"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/colorBlack"
+            />-->
         <ImageView
             android:id="@+id/logo"
             android:layout_width="89dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_clocklogo_actionbar"
-            android:layout_centerVertical="true"
-            />
+            android:layout_marginTop="15dp"/>
+            <!--android:layout_below="@id/ads" />-->
+
         <EditText
             android:id="@+id/title_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/logo"
-            android:textSize="15dp"
+            android:layout_below="@+id/logo"
+            android:textSize="25dp"
             android:background="@color/transparent_all"
-            android:layout_centerVertical="true"
             android:hint="Filename (Touch to edit)"
+            android:layout_marginTop="7dp"
+            android:layout_marginLeft="15dp"
+            android:paddingBottom="2dp"
             />
 
     </RelativeLayout>

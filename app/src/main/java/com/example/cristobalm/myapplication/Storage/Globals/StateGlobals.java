@@ -14,9 +14,15 @@ public class StateGlobals {
 
     // filenames_list
     public static final String LISTS_FILENAMES = "list_filenames";
+    // ids
+    public static final String LISTS_IDS = "lists_ids";
+
+    // map
+    public static final String LIST_NAMES_MAP = "list_names_map";
 
     // index
     public static final String CURRENT_INDEX = "current_index";
+    public static final String UNIQUE_ID = "unique_id";
 
 
 }

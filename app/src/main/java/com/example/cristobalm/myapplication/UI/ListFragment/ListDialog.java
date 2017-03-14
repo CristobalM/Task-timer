@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 
 import java.util.ArrayList;
@@ -23,27 +24,36 @@ import java.util.ArrayList;
  */
 
 public class ListDialog extends AlertDialog.Builder {
-    ArrayList<ListItemInfo> list_items;
-    public ListDialog(Context context, ArrayList<ListItemInfo> list_items, int theme){
+    ;
+    LinearLayout list;
+    public ListDialog(Context context, int theme, ArrayList<ListItemInfo> list_items ){
         super(context, theme);
-
-        this.list_items = list_items;
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.lists_dialog, null);
 
-        LinearLayout list = (LinearLayout) view.findViewById(R.id.filenames_list);
-        if(list_items != null && list != null) {
+        //ArrayList<ListItemInfo> list_items = builtListItemInfoArrayList();
+        list = (LinearLayout) view.findViewById(R.id.filenames_list);
+
+        //list.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        if (list_items != null && list != null) {
             for (int i = 0; i < list_items.size(); i++) {
                 ListItem auxListItem = list_items.get(i).getListItem();
-                if(auxListItem.getParent()!=null){
+                if (auxListItem.getParent() != null) {
                     ((ViewGroup) auxListItem.getParent()).removeView(auxListItem);
                 }
                 list.addView(auxListItem);
             }
         }
 
+
+        //this.list_items = timingService.builtListItemInfoArrayList();
+
         setView(view);
+    }
+
+    public LinearLayout getList(){
+        return list;
     }
 
 

@@ -15,6 +15,17 @@
     <color name="transparent">#80000000</color>
     <color name="transparent_all">#00000000</color>
 
+    <color name="notificationBackground">#5bffffff</color>
+    <color name="whiteTransparent">#5bffffff</color>
+
+    <color name="itemNotificationBackground">#00000000</color>
+    <color name="itemNotificationBackgroundON">#29e47f04</color>
+    <color name="itemNotificationText">#000</color>
+
+    <color name="redBack">#df5e07</color>
+
+    <color name="white_some_transparency">#d5ffffff</color>
+
 
 
 </resources>

@@ -20,9 +20,9 @@ import java.util.ArrayList;
 
 public class ListFragment extends DialogFragment {
     TimingService timingService;
-    public static ListFragment newInstance(TimingService timingService){
+    public static ListFragment newInstance(TimingService timingService, ArrayList<ListItemInfo> list_items){
         ListFragment listFragment = new ListFragment();
-        listFragment.setInfo(timingService);
+        listFragment.setInfo(timingService, list_items);
         listFragment.setRetainInstance(true);
 
         return listFragment;
@@ -41,12 +41,24 @@ public class ListFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        ArrayList<ListItemInfo> list_items = timingService.builtListItemInfoArrayList();
-        resetColors();
-        ListDialog listDialog = new ListDialog(getActivity(), list_items, 0);
+        //resetColors();
         timingService.loadFile(timingService.getCurrentIndexFile());
-        listDialog.setPositiveButton(R.string.ok,  new OkButtonListener(timingService));
+        timingService.reloadColor();
+        ListDialog listDialog = new ListDialog(getActivity(), R.style.MyDialogTheme, listItemInfos);
+        listDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                timingService.setOffOpeningDialogFragment();
+                //timingService.clearOtherBackground();
+            }
+        });
+        listDialog.setPositiveButton(R.string.open,  new OkButtonListener(timingService));
+        timingService.setFilesDialogList(listDialog.getList());
+
+        //listDialog.setView(timingService.getViewForDialog(getActivity(), listItemInfos));
+
         AlertDialog to_return = listDialog.create();
+        to_return.setTitle("Select file to open");
         return to_return;
     }
     public void onCancel(DialogInterface dialog){
@@ -59,13 +71,14 @@ public class ListFragment extends DialogFragment {
             return;
         }
         for(int i = 0; i < list_items.size(); i++){
-            list_items.get(i).setBackgroundColor(R.color.colorDescriptionBackground);
+            list_items.get(i).setBackgroundColor(R.color.itemNotificationBackground);
         }
 
     }
-
-    public void setInfo(TimingService timingService){
+    ArrayList<ListItemInfo> listItemInfos;
+    public void setInfo(TimingService timingService, ArrayList<ListItemInfo> listItemInfos){
         this.timingService = timingService;
+        this.listItemInfos = listItemInfos;
     }
 
     public class OkButtonListener implements DialogInterface.OnClickListener{
