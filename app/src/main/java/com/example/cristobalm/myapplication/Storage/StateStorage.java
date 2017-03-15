@@ -172,48 +172,27 @@ public final class StateStorage {
         }
     }
 
-    public void saveLastIndexFile(int index){
-        String current_data = getFileJSONString();
-        try{
-            JSONObject jsonObject = new JSONObject(current_data);
-            jsonObject.put(StateGlobals.CURRENT_INDEX, index);
-            String storing_json_data = jsonObject.toString();
-            fileHandling.writeToFile(filename, storing_json_data);
-        }
-        catch(JSONException e){
-            Log.e("saveLastIndexFile", ".." + e.getMessage() );
-        }
-    }
-    public void saveUniqueID(int unique_id){
-        String current_data = getFileJSONString();
-        try{
-            JSONObject jsonObject = new JSONObject(current_data);
-            jsonObject.put(StateGlobals.UNIQUE_ID, (unique_id));
-            String storing_json_data = jsonObject.toString();
-            fileHandling.writeToFile(filename, storing_json_data);
-        }
-        catch (JSONException e){
-            Log.e("getUniqueID", ".. " + e.getMessage() );
-        }
-    }
     public int getUniqueID(){
         String current_data = getFileJSONString();
-        int out = -1;
+        Log.e("getUniqueID()", "current_data: "+ current_data);
+        int out = 0;
         try{
             JSONObject jsonObject = new JSONObject(current_data);
             if(jsonObject.has(StateGlobals.UNIQUE_ID)){
                 String id =  jsonObject.getString(StateGlobals.UNIQUE_ID);
                 out = Integer.parseInt(id);
-            }else{
+            }
+            /*else{
                 out = 0;
                 jsonObject.put(StateGlobals.UNIQUE_ID, out);
                 String storing_json_data = jsonObject.toString();
                 fileHandling.writeToFile(filename, storing_json_data);
-            }
+            }*/
         }
         catch (JSONException e){
             Log.e("getUniqueID", ".. " + e.getMessage() );
         }
+
         return out;
     }
 
@@ -234,7 +213,7 @@ public final class StateStorage {
         return out;
     }
 
-    public void saveListAndMapFiles(Hashtable<Integer, String> hashtable, ArrayList<Integer> ids){
+    public void saveAll(Hashtable<Integer, String> hashtable, ArrayList<Integer> ids, int unique_id, int current_index, boolean repeat_state){
         String current_data = getFileJSONString();
         try{
             JSONObject jsonObject = new JSONObject(current_data);
@@ -246,43 +225,26 @@ public final class StateStorage {
                     _map.put(_key, name);
                 }
             }
-            jsonObject.put(StateGlobals.LIST_NAMES_MAP, _map);
             JSONArray jsonArray = new JSONArray(ids);
 
-            jsonObject.put(StateGlobals.LISTS_IDS, jsonArray);
-            String storing_json_data = jsonObject.toString();
-            Log.e("saveFileListIDS", "saveFileListIDS JSON!: "+ storing_json_data );
-            fileHandling.writeToFile(filename, storing_json_data);
-
-
-        }
-        catch (JSONException e){
-            Log.e("saveFileNamesMap", ".. " + e.getMessage() );
-        }
-    }
-
-    public void saveFileNamesMap(Hashtable<Integer, String> hashtable, ArrayList<Integer> ids){
-        String current_data = getFileJSONString();
-        try{
-            JSONObject jsonObject = new JSONObject(current_data);
-            JSONObject _map = new JSONObject();
-            for(int i = 0; i < ids.size(); i++){
-                String name = hashtable.get(ids.get(i));
-                if(name != null) {
-                    String _key = String.valueOf(ids.get(i));
-                    _map.put(_key, name);
-                }
-            }
             jsonObject.put(StateGlobals.LIST_NAMES_MAP, _map);
+            jsonObject.put(StateGlobals.LISTS_IDS, jsonArray);
+
+            jsonObject.put(StateGlobals.UNIQUE_ID, (unique_id));
+            jsonObject.put(StateGlobals.CURRENT_INDEX, (current_index));
+            jsonObject.put(StateGlobals.REPEAT_STATE, repeat_state);
+
             String storing_json_data = jsonObject.toString();
-            Log.e("saveFileNamesMap", "saveFileNamesMap JSON!: "+ storing_json_data );
+            Log.e("saveListAndMapFiles", "saveListAndMapFiles JSON!: "+ storing_json_data );
             fileHandling.writeToFile(filename, storing_json_data);
+
 
         }
         catch (JSONException e){
             Log.e("saveFileNamesMap", ".. " + e.getMessage() );
         }
     }
+
     public Hashtable<Integer, String> getFileNamesMap(ArrayList<Integer> ids){
         String current_data = getFileJSONString();
         Hashtable<Integer, String> hashtable = new Hashtable<>();
@@ -416,6 +378,7 @@ public final class StateStorage {
         for(int i = 0; i < bulk_delete.size(); i++) {
             String filename = FilenameGlobals.LIST_SAVE(bulk_delete.get(i));
             fileHandling.deleteFile(filename);
+            Log.d("deleteFiles", "deleting file: " + filename);
         }
     }
 

@@ -21,6 +21,8 @@
         </activity>
         <receiver android:name=".Services.TimeReceiver" />
         <service android:name=".Services.TimingService" android:exported="false"/>
+
+        
     </application>
 
 </manifest>

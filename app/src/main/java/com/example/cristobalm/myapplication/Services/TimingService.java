@@ -86,6 +86,10 @@ public class TimingService extends Service {
 
     int to_load_file;
 
+    public void saveRepeatState(boolean state){
+        repeatState = state;
+    }
+
     public void loadFile(int index_file){
         to_load_file = index_file;
     }
@@ -99,7 +103,6 @@ public class TimingService extends Service {
 
         saveFile();
         current_index_file = to_load_file;
-        getStateStorage().saveLastIndexFile(to_load_file);
         map_timefields = null;
         time_fields = null;
         map_timefields = retrieveMapTimefields();
@@ -203,9 +206,6 @@ public class TimingService extends Service {
     public Hashtable<Integer, String> getFileNamesMap(){
         if(fileNamesMap == null){
             fileNamesMap = getConfigStates().getFileNamesMap(getFileListIDS());
-            if(fileNamesMap.get(0) == null){
-                fileNamesMap.put(0, "");
-            }
         }
         return fileNamesMap;
     }
@@ -295,11 +295,6 @@ public class TimingService extends Service {
         filesDialogList = ll;
     }
 
-    RelativeLayout sugran;
-    public boolean is_set = false;
-
-
-
 
     public ArrayList<ListItemInfo> builtListItemInfoArrayList (){
         if(listItemInfoArrayList == null) {
@@ -331,29 +326,22 @@ public class TimingService extends Service {
     }
     public int nextUniqueID(){
         int out = getUniqueID();
-        unique_id = out+1;
+        Log.d("nextUniqueID","out:"+out);
+        unique_id++;
         return out;
-    }
-    public void saveUniqueID(){
-        getConfigStates().saveUniqueID(getUniqueID());
     }
 
     public void saveAll(){
         saveFile();
-        saveUniqueID();
-        saveMapAndList();
+        getConfigStates().saveAll(getFileNamesMap(), getFileListIDS(), getUniqueID(), getCurrentIndexFile(), getRepeatState());
     }
-    public void saveMapAndList(){
-        getConfigStates().saveListAndMapFiles(getFileNamesMap(), getFileListIDS());
-    }
-
     public void newFile(){
         saveFile();
         totalSeconds=null;
         current_index_file = nextUniqueID();
 
         Log.e("UNIQUE_IDIS", ":" + current_index_file);
-        getStateStorage().saveLastIndexFile(current_index_file);
+        //getStateStorage().saveLastIndexFile(current_index_file);
         map_timefields = new Hashtable<>();
         time_fields = new ArrayList<>();
         saveFile();
@@ -368,15 +356,12 @@ public class TimingService extends Service {
                 main_activity.getTitle_list().setText("");
             }
             main_activity.reloadButtonStates();
-
+            Toast.makeText(main_activity, "New file created", Toast.LENGTH_SHORT).show();
         }
         listItemInfoArrayList = null;
-        /*
-        ListItemInfo listItemInfo = new ListItemInfo(this, this, getCurrentIndexFile());
-        listItemInfo.setFile_name("");
-        listItemInfo.setHint("File " + (getIDorder(getCurrentIndexFile())+1));
-        builtListItemInfoArrayList().add(listItemInfo);
-        */
+
+
+
     }
 
 
@@ -389,14 +374,18 @@ public class TimingService extends Service {
     public int getCurrentIndexFile(){
         if(current_index_file == null){
             Log.d("getCurrentIndexFile", "retrieving current index file");
-            current_index_file = getStateStorage().getLastIndexFile();
+            current_index_file = getConfigStates().getLastIndexFile();
             if(current_index_file < 0 || getIDorder(current_index_file) == null ||getFileListIDS().size() <= getIDorder(current_index_file)){
                 current_index_file = getFileListIDS().size() > 0 ? getFileListIDS().get(0) : 0;
                 if(getFileListIDS().size() == 0){
                     current_index_file = nextUniqueID();
                     getFileListIDS().add(current_index_file);
                 }
-                getStateStorage().saveLastIndexFile(current_index_file);
+                //getStateStorage().saveLastIndexFile(current_index_file);
+                if(getFileNamesMap().get(current_index_file) == null){
+                    getFileNamesMap().put(current_index_file, "");
+                }
+                reloadOrder();
             }
         }else{
             Log.d("getCurrentIndexFile", "NOT retrieving current index file");
@@ -432,13 +421,7 @@ public class TimingService extends Service {
         if(map_timefields == null || time_fields == null) {
             int current_index = getCurrentIndexFile();
             Log.d("retrieveMapTimefields", "current index is "+ current_index);
-            if (current_index == -1) {
-                current_index = getUniqueID();
-                getStateStorage().saveLastIndexFile(current_index);
-                Pair<Hashtable<Integer, Timefield>, ArrayList<Integer>> empty_stuff = new Pair<>(new Hashtable<Integer, Timefield>(), new ArrayList<Integer>());
-                getStateStorage().saveFileList(empty_stuff, current_index);
 
-            }
 
             Pair<Hashtable<Integer, Timefield>, Integer> pair = getStateStorage().getFileList(current_index);  //getStateStorage().getTimeFieldsList(StateGlobals.SAVE_STATE);
             map_timefields = pair.first;
@@ -474,13 +457,6 @@ public class TimingService extends Service {
         }
         return repeatState;
     }
-    public void saveRepeatState(boolean _repeatState){
-        repeatState = _repeatState;
-    }
-    public void saveRepeatState(){
-        getConfigStates().saveRepeatState(repeatState);
-    }
-
 
     public int getNotification_id(){
         return notification_id;
@@ -543,7 +519,6 @@ public class TimingService extends Service {
             timingNotifications.stopNotification(notification_id);
         }
         //stopTimer();
-        saveRepeatState();
         saveAll();
         bulkDelete();
         Log.d("onDestroy", "destroyed service!!!!!!!!");

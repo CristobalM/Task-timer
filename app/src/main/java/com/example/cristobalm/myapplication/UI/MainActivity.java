@@ -130,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     public MainActivity getMyInstance(){
         return this;
     }
@@ -425,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("saveState","Saving state #"+state);
         }
         */
-        if(mService != null){
+        if(mService != null && false){
             //mService.saveFile();
             mService.saveAll();
         }
