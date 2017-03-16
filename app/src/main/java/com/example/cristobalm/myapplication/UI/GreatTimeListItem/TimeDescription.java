@@ -74,7 +74,7 @@ public class TimeDescription extends EditText {
             height = desiredHeight;
         }
 
-        setMeasuredDimension(widthSize - VisualSettingGlobals.getPixels(100,scale), height);
+        setMeasuredDimension(widthSize - VisualSettingGlobals.getPixels(150,scale), height);
     }
 
     @Override

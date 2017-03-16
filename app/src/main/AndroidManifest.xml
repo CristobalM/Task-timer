@@ -22,7 +22,12 @@
         <receiver android:name=".Services.TimeReceiver" />
         <service android:name=".Services.TimingService" android:exported="false"/>
 
-        
+        <receiver android:name=".Services.ShutdownReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.QUICKBOOT_POWEROFF" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

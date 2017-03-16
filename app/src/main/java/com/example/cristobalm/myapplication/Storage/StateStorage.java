@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
+import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.Timefield;
@@ -39,6 +40,7 @@ public final class StateStorage {
     private static String TIME_FIELDS = "time_fields";
     private static String CUSTOM_TEXT = "custom_text";
     private static String MILLISECONDS = "milliseconds";
+    private static String SOUNDID = "sound_id";
     private FileHandling fileHandling;
     private String filename;
     private boolean fileExists;
@@ -50,66 +52,7 @@ public final class StateStorage {
         fileHandling = new FileHandling(context);
         fileExists = fileHandling.fileExists(filename);
     }
-    public StateStorage(Context context){
-        this.context = context;
-        fileHandling = new FileHandling(context);
-    }
 
-    private void storeStateIntoJSONFile(String keyname, Object data, int state){
-        String current_data = getFileJSONString();
-        JSONObject jsonObject;
-        try{
-            jsonObject = new JSONObject(current_data);
-            jsonObject.put(keyname + String.valueOf(state), data);
-            String storing_json_data = jsonObject.toString();
-            fileHandling.writeToFile(filename, storing_json_data);
-        }
-        catch (JSONException e){
-            Log.e("storeStateIntoJSONFile", "Can not parse json data");
-        }
-    }
-
-    public void storeTimeFieldsList(ArrayList<Integer> time_fields, Hashtable<Integer, Timefield> map, int state){
-        JSONArray list_building = new JSONArray();
-        for(int i = 0; i < time_fields.size(); i++){
-            JSONObject temp_pair = new JSONObject();
-            try {
-                temp_pair.put(CUSTOM_TEXT, map.get(time_fields.get(i)).getCustomText());
-                temp_pair.put(MILLISECONDS, map.get(time_fields.get(i)).getMilliseconds());
-                list_building.put(temp_pair);
-                Log.d("storeTimeFieldsList", "storing field with name "+ map.get(time_fields.get(i)).getCustomText());
-            }
-            catch(JSONException e){
-                Log.d("storeTimeFieldsList", "can not store element with custom text:" + map.get(time_fields.get(i)).getCustomText() );
-            }
-        }
-        storeStateIntoJSONFile(TIME_FIELDS, list_building, state);
-    }
-
-    public Pair<Hashtable<Integer, Timefield>, Integer> getTimeFieldsList(int state){
-        JSONArray receive_data = getStateList(TIME_FIELDS, state);
-        //LinkedList<Timefield> time_fields = new LinkedList<>();
-        Hashtable<Integer, Timefield> map_time_fields = new Hashtable<>();
-        if(receive_data == null){
-            Log.d("getTimeFieldsList", "receive_data is null!!");
-            return null;
-        }
-        for(int i = 0; i < receive_data.length(); i++){
-            try {
-                JSONObject pair = receive_data.getJSONObject(i);
-                Log.d("getTimeFieldsListLoop", "index:"+i+", string:"+pair.getString(CUSTOM_TEXT));
-                Timefield tfield = new Timefield(context, i, pair.getString(CUSTOM_TEXT), Integer.parseInt(pair.getString(MILLISECONDS)));
-                //time_fields.addLast(tfield);
-                map_time_fields.put(i, tfield);
-
-            }
-            catch (JSONException e){
-                Log.d("getTimeFieldsList", "can not read pair with index " + i);
-            }
-        }
-
-        return new Pair<>(map_time_fields, receive_data.length()) ;
-    }
     private String getFileJSONString(){ // Correct with commments
         String current_data;
 
@@ -159,18 +102,7 @@ public final class StateStorage {
         }
         return out;
     }
-    public void saveRepeatState(boolean state){
-        String current_data = getFileJSONString();
-        try{
-            JSONObject jsonObject = new JSONObject(current_data);
-            jsonObject.put(StateGlobals.REPEAT_STATE, state);
-            String storing_json_data = jsonObject.toString();
-            fileHandling.writeToFile(filename, storing_json_data);
-        }
-        catch(JSONException e){
-            Log.e("saveRepeatState", "not found repeat state: " + e.getMessage() );
-        }
-    }
+
 
     public int getUniqueID(){
         String current_data = getFileJSONString();
@@ -213,7 +145,50 @@ public final class StateStorage {
         return out;
     }
 
-    public void saveAll(Hashtable<Integer, String> hashtable, ArrayList<Integer> ids, int unique_id, int current_index, boolean repeat_state){
+    public int getCommonSound(){
+        String current_data = getFileJSONString();
+        Log.e("getCommonSound()", "current_data: "+ current_data);
+        int out = InfoNameGlobals._NOTIFICATION_TWO;
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            if(jsonObject.has(StateGlobals.COMMON_SOUND)){
+                String id =  jsonObject.getString(StateGlobals.COMMON_SOUND);
+                out = Integer.parseInt(id);
+            }
+
+        }
+        catch (JSONException e){
+            Log.e("getUniqueID", ".. " + e.getMessage() );
+        }
+
+        return out;
+    }
+    public int getFinishSound(){
+        String current_data = getFileJSONString();
+        Log.e("getFinishSound()", "current_data: "+ current_data);
+
+        int out = InfoNameGlobals._NOTIFICATION_ONE;
+        try{
+            JSONObject jsonObject = new JSONObject(current_data);
+            if(jsonObject.has(StateGlobals.FINISH_SOUND)){
+                String id =  jsonObject.getString(StateGlobals.FINISH_SOUND);
+                out = Integer.parseInt(id);
+            }
+        }
+        catch (JSONException e){
+            Log.e("getUniqueID", ".. " + e.getMessage() );
+        }
+
+        return out;
+    }
+
+    public void saveAll(Hashtable<Integer, String> hashtable,
+                        ArrayList<Integer> ids,
+                        int unique_id,
+                        int current_index,
+                        boolean repeat_state,
+                        int common_sound,
+                        int finish_sound){
         String current_data = getFileJSONString();
         try{
             JSONObject jsonObject = new JSONObject(current_data);
@@ -233,6 +208,9 @@ public final class StateStorage {
             jsonObject.put(StateGlobals.UNIQUE_ID, (unique_id));
             jsonObject.put(StateGlobals.CURRENT_INDEX, (current_index));
             jsonObject.put(StateGlobals.REPEAT_STATE, repeat_state);
+
+            jsonObject.put(StateGlobals.COMMON_SOUND, common_sound);
+            jsonObject.put(StateGlobals.FINISH_SOUND, finish_sound);
 
             String storing_json_data = jsonObject.toString();
             Log.e("saveListAndMapFiles", "saveListAndMapFiles JSON!: "+ storing_json_data );
@@ -291,23 +269,6 @@ public final class StateStorage {
     }
 
 
-
-    public void saveFileListIDS(ArrayList<Integer> fileListIDS){
-        String current_data = getFileJSONString();
-        try{
-            JSONObject jsonObject = new JSONObject(current_data);
-            JSONArray jsonArray = new JSONArray(fileListIDS);
-
-            jsonObject.put(StateGlobals.LISTS_IDS, jsonArray);
-            String storing_json_data = jsonObject.toString();
-            Log.e("saveFileListIDS", "saveFileListIDS JSON!: "+ storing_json_data );
-            fileHandling.writeToFile(filename, storing_json_data);
-        }
-        catch(JSONException e){
-            Log.e("saveFileListIDS", "ERROR : " + e.getMessage() );
-        }
-    }
-
     public Pair<Hashtable<Integer, Timefield>, Integer> getFileList(int index_file){
         Pair<Hashtable<Integer, Timefield>, Integer> stored_data = null;
         CSVReader csvReader;
@@ -329,7 +290,9 @@ public final class StateStorage {
                 }else {
                     Log.d("getFileList", " row[1] is " + row[1]);
                     int millis = row[1].length() > 0 ? Integer.parseInt(row[1]) : 0;
+                    int soundID = row[2].length() > 0 ? Integer.parseInt(row[2]) : InfoNameGlobals._NOTIFICATION_TWO;
                     Timefield timefield = new Timefield(context, counter, row[0], millis);
+                    timefield.setSound(soundID);
                     map.put(counter, timefield);
                     counter++;
                 }
@@ -355,11 +318,16 @@ public final class StateStorage {
         StringWriter stringWriter = new StringWriter();
         Log.d("saveFileList", "writing to file: " + FilenameGlobals.LIST_SAVE(index_file) + ", items_quantity:"+time_fields.size());
         csvWriter = new CSVWriter(stringWriter);
-        String [] entries = {CUSTOM_TEXT, MILLISECONDS};
+        String [] entries = {CUSTOM_TEXT, MILLISECONDS, SOUNDID};
         ArrayList<String[]> list = new ArrayList<>();
         list.add(entries);
         for(int i = 0; i < time_fields.size(); i++){
-            String [] item_csv = {map.get(time_fields.get(i)).getCustomText(), String.valueOf(map.get(time_fields.get(i)).getMilliseconds())};
+            Timefield _timefield = map.get(time_fields.get(i));
+            String [] item_csv = {
+                    map.get(time_fields.get(i)).getCustomText(),
+                    String.valueOf(_timefield.getMilliseconds()),
+                    String.valueOf(_timefield.getSoundId())
+            };
             list.add(item_csv);
         }
         //csvWriter.writeNext(entries);

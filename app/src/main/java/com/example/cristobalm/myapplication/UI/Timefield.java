@@ -20,6 +20,7 @@ import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTOnDragListen
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.DescriptionTouchEvent;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
 import com.example.cristobalm.myapplication.UI.GreatTimePicker.GreatTimePickerFragment;
+import com.example.cristobalm.myapplication.UI.MusicFragment.MusicFragment;
 
 
 /**
@@ -41,6 +42,12 @@ public class Timefield {
     TLLRunnable tllRunnable;
 
 
+
+    public Timefield getMe(){
+        return this;
+    }
+
+
     public class TLLRunnable implements  Runnable{
         TimeLinearLayout tll;
         ScrollView sv;
@@ -56,12 +63,6 @@ public class Timefield {
         }
     }
 
-    public void setTimeTemp(int milliseconds){
-        temp_time_container.setMilliseconds(milliseconds);
-    }
-    public void setTime(TimeContainer t_container){
-        time_container.setMilliseconds(t_container.getMilliseconds());
-    }
     public void setTime(int milliseconds){
         time_container.setMilliseconds(milliseconds);
     }
@@ -93,9 +94,42 @@ public class Timefield {
         }
     }
 
+    Integer soundId;
+    public void setSound(int id){
+        this.soundId = id;
+    }
+    public int getSoundId(){
+        return soundId;
+    }
+
+
+    public class OnMusicTouch implements View.OnTouchListener{
+        public boolean onTouch(View v, MotionEvent e){
+            switch (e.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    if(main_activity.getState() == MainStateGlobals.STATE_IDLE) {
+                        main_activity.mService.setOnOpeningDialogFragment();
+                        Intent keep_service_on = new Intent(context, TimingService.class);
+                        keep_service_on.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.KEEP_ON);
+                        context.startService(keep_service_on);
+
+                        MusicFragment musicFragment = MusicFragment.newInstance(main_activity.mService, getMe());
+                        musicFragment.show(main_activity.getFragmentManager(), "musicPicker");
+
+
+
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+            }
+            return true;
+        }
+    }
+
     Timefield(Context context, int index, MainActivity main_activity){
         this.context = context;
-        main_activity = main_activity;
+        this.main_activity = main_activity;
         setIndex(index);
         time_container = new TimeContainer(0);
 
@@ -121,12 +155,18 @@ public class Timefield {
                 time_container.getHours(),
                 time_container.getMinutes(),
                 time_container.getSeconds());
+        //timeLinearLayout.setMusicColor(InfoNameGlobals.getSound(getSoundId()));
 
     }
 
     void startTimefieldView(MainActivity activity){
         main_activity = activity;
         //main_activity.unique_index++;
+        if(soundId == null) {
+            setSound(main_activity.mService.getCommonSound());
+        }
+
+
 
         timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout.getTimeDraggable(), main_activity));
         timeLinearLayout.setOnDragListener(new GTOnDragListener(timeLinearLayout, main_activity, this));
@@ -136,7 +176,11 @@ public class Timefield {
         timeLinearLayout.getTimeDescription().setOnTouchListener(new DescriptionTouchEvent(this));
 
         timeLinearLayout.setCountdownListener(new CountdownOnTouchListener(static_index, main_activity));
-
+        timeLinearLayout.setMusicListener(new OnMusicTouch());
+        updateMusicColor();
+    }
+    public void updateMusicColor(){
+        timeLinearLayout.setMusicColor(InfoNameGlobals.getSColorById(getSoundId()));
     }
 
     public void focusInScroll(){

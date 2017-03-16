@@ -64,6 +64,7 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
         greatTimePicker = (GreatTimePicker) view.findViewById(R.id.great_time_picker);
 
         this.setPositiveButton(R.string.ok, this);
+        this.setNegativeButton(R.string.cancel, null);
 
 
         greatTimePicker.setCurrentHours(TimeContainer.getHours(millis));
@@ -78,6 +79,7 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
 
 
     }
+
     @Override
     public void onTimeChanged(GreatTimePicker view, int millis){
         //Log.d("OnTimeChanged","GreatTimePickerDialog: hours:"+hours+", minutes:"+minutes+", seconds:"+seconds);

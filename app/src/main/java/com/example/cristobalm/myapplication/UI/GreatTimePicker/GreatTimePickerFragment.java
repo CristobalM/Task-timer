@@ -93,7 +93,7 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
             millis = 0;
         }
 
-        greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), 0, this, millis);
+        greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), R.style.MyDialogTheme, this, millis);
         greatTimePickerDialog.setTitle("Select time");
 
         return greatTimePickerDialog.create();

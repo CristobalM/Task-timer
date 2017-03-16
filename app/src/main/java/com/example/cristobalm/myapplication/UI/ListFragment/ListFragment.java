@@ -65,16 +65,7 @@ public class ListFragment extends DialogFragment {
         timingService.setOffOpeningDialogFragment();
         super.onCancel(dialog);
     }
-    public void resetColors(){
-        ArrayList<ListItemInfo> list_items = timingService.builtListItemInfoArrayList();
-        if(list_items==null){
-            return;
-        }
-        for(int i = 0; i < list_items.size(); i++){
-            list_items.get(i).setBackgroundColor(R.color.itemNotificationBackground);
-        }
 
-    }
     ArrayList<ListItemInfo> listItemInfos;
     public void setInfo(TimingService timingService, ArrayList<ListItemInfo> listItemInfos){
         this.timingService = timingService;

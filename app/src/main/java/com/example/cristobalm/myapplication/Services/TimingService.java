@@ -86,6 +86,65 @@ public class TimingService extends Service {
 
     int to_load_file;
 
+
+    Integer to_load_music_id;
+    Timefield to_load_music_timefield;
+
+    public void loadMusic(int music_id, Timefield _timefield){
+        to_load_music_id = music_id;
+        to_load_music_timefield = _timefield;
+    }
+    public void startLoadMusic(){
+        if(to_load_music_timefield != null && to_load_music_id != null){
+            to_load_music_timefield
+                    .setSound(to_load_music_id);
+            to_load_music_timefield
+                    .getTimeLinearLayout()
+                    .setMusicColor(InfoNameGlobals.getSColorById(to_load_music_id));
+        }
+    }
+
+
+    Integer tempFinishingSound = null;
+    Integer tempCommonSound = null;
+    public void setConfigMusic(int which, int idmusic){
+        switch (which){
+            case InfoNameGlobals.SOUND_FINISHING:
+                tempFinishingSound = idmusic;
+                break;
+            case InfoNameGlobals.SOUND_COMMON:
+                tempCommonSound = idmusic;
+                break;
+        }
+    }
+    public Integer getTempFinishingSound(){
+        return tempFinishingSound;
+    }
+
+    public Integer getTempCommonSound(){
+        return tempCommonSound;
+    }
+    public void processChange(boolean applyToAllChecked){
+        if(tempFinishingSound != null){
+            finishSound = tempFinishingSound;
+            tempFinishingSound = null;
+        }else if(tempCommonSound != null){
+            commonSound = tempCommonSound;
+            tempCommonSound = null;
+            if(applyToAllChecked) {
+                setAllSoundsToCommon();
+            }
+        }
+    }
+    public void setAllSoundsToCommon(){
+        for(int i = 0; i < retrieveTimefields().size(); i++){
+            Timefield _timefield = getTFAt(i);
+            _timefield.setSound(getCommonSound());
+            _timefield.updateMusicColor();
+        }
+    }
+
+
     public void saveRepeatState(boolean state){
         repeatState = state;
     }
@@ -242,6 +301,7 @@ public class TimingService extends Service {
             Toast.makeText(main_activity, "Please open other file first", Toast.LENGTH_SHORT).show();
             return;
         }
+        loadFile(getCurrentIndexFile());
         Log.e("removeID", "id:"+ id + " order:" + getIDorder(id)+ ", arrayinfosize:"+ builtListItemInfoArrayList().size());
         reloadOrder();
         getFilesDialogList().removeView(builtListItemInfoArrayList().get(getIDorder(id)).getListItem());
@@ -331,9 +391,24 @@ public class TimingService extends Service {
         return out;
     }
 
+    Integer commonSound;
+    public int getCommonSound(){
+        if(commonSound == null){
+            commonSound = getStateStorage().getCommonSound();
+        }
+        return commonSound;
+    }
+    Integer finishSound;
+    public int getFinishSound(){
+        if(finishSound == null){
+            finishSound = getStateStorage().getFinishSound();
+        }
+        return finishSound;
+    }
+
     public void saveAll(){
         saveFile();
-        getConfigStates().saveAll(getFileNamesMap(), getFileListIDS(), getUniqueID(), getCurrentIndexFile(), getRepeatState());
+        getConfigStates().saveAll(getFileNamesMap(),  getFileListIDS(), getUniqueID(), getCurrentIndexFile(), getRepeatState(), getCommonSound(), getFinishSound());
     }
     public void newFile(){
         saveFile();
@@ -511,6 +586,9 @@ public class TimingService extends Service {
             Log.d("onStartCommand", "Action is CONTINUE_TIMING!!");
             continueTimer();
         }
+        else if(action.equals(InfoNameGlobals.SHUTDOWN)){
+            saveAll();
+        }
         return mStartMode;
     }
     @Override
@@ -603,6 +681,12 @@ public class TimingService extends Service {
         timerScheduling(getLastRemainingMillis());
     }
 
+    public Timefield getTimefieldInOrder(int order){
+        return retrieveMapTimefields().get(retrieveTimefields().get(order));
+    }
+    public int getSoundInOrder(int order){
+        return getTimefieldInOrder(order).getSoundId();
+    }
 
     private void continueTimer(){
         Log.d("continueTimer", "called continue timer! current_timer_index:" + current_timer_index);
@@ -613,13 +697,13 @@ public class TimingService extends Service {
             if(repeatState){
                 timingNotifications.sendNotification(1,
                         MainActivity.class,
-                        "Finished all countdowns.. Repeating", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
+                        "Finished all countdowns.. Repeating",  InfoNameGlobals.getSound(getSoundInOrder(retrieveTimefields().size()-1)), Notification.PRIORITY_HIGH);
 
                 timerScheduling(-1);
             }else{
                 timingNotifications.sendNotification(1,
                         MainActivity.class,
-                        "Finished all countdowns", InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
+                        "Finished all countdowns", InfoNameGlobals.getSound(getFinishSound()), Notification.PRIORITY_HIGH);
                 stopTimer();
                 setOffWaitingForScheduled();
 
@@ -630,7 +714,7 @@ public class TimingService extends Service {
             // continue next iteration
             timingNotifications.sendNotification(0, MainActivity.class,
                     "Continuing on task #" + current_timer_index + ". " + getTFAt(current_timer_index).getCustomText() +
-                            ". Total time: " + getTimeString(), InfoNameGlobals.NOTIFICATION_ONE, Notification.PRIORITY_HIGH);
+                            ". Total time: " + getTimeString(), InfoNameGlobals.getSound(getSoundInOrder((getCurrent_timer_index() -1))), Notification.PRIORITY_HIGH);
             timerScheduling(-1);
         }
     }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
+import com.example.cristobalm.myapplication.UI.ConfigFragment.ConfigOnTouchListener;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView newFileButton;
     ImageView listsButton;
+    ImageView configButton;
 
     ListsLayout listsLayout;
 
@@ -261,6 +263,10 @@ public class MainActivity extends AppCompatActivity {
 
         listsButton = (ImageView) findViewById(R.id.open_files);
         listsButton.setOnTouchListener(new ListOnTouchListener(this));
+
+
+        configButton = (ImageView) findViewById(R.id.open_config);
+        configButton.setOnTouchListener(new ConfigOnTouchListener(this));
 
         reloadButtonStates();
         reloadCurrentTitle();

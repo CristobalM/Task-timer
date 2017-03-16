@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 
 public class ListDialog extends AlertDialog.Builder {
-    ;
+
     LinearLayout list;
     public ListDialog(Context context, int theme, ArrayList<ListItemInfo> list_items ){
         super(context, theme);

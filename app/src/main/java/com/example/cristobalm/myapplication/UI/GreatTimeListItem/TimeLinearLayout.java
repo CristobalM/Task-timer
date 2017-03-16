@@ -2,7 +2,10 @@ package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
 import android.text.method.KeyListener;
@@ -33,6 +36,7 @@ public class TimeLinearLayout extends LinearLayout {
     private TimeDescription timeDescription;
     private TimeCountdownView timeCountdownView;
     private TimeDraggable timeDraggable;
+    private ImageView timeMusic;
     AttributeSet attrs;
 
     LinearLayout items_container;
@@ -45,6 +49,12 @@ public class TimeLinearLayout extends LinearLayout {
     private int position;
 
     private float scale;
+
+
+    public void setMusicColor(int color){
+        timeMusic.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        timeMusic.invalidate();
+    }
 
     public void setTime(int hours, int minutes, int seconds){
         TimeContainer timeContainer = new TimeContainer(hours, minutes, seconds);
@@ -91,6 +101,7 @@ public class TimeLinearLayout extends LinearLayout {
         timeCountdownView = new TimeCountdownView(context);
         timeDraggable = new TimeDraggable(context);
         imageView = new ImageView(context);
+        timeMusic = new ImageView(context);
 
         Typeface retrieveFont = VisualSettingGlobals.FontCache.get(VisualSettingGlobals.TEXT_FONT, context);
 
@@ -130,6 +141,21 @@ public class TimeLinearLayout extends LinearLayout {
             timeCountdownView.setTypeface(retrieveFont);
         }
 
+        Drawable music_drawable;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            music_drawable = getResources().getDrawable(R.drawable.ic_musical_note , null);
+        }
+        else{
+            music_drawable =  getResources().getDrawable(R.drawable.ic_musical_note);
+        }
+        LayoutParams tmusic_params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, VisualSettingGlobals.getPixels(50, scale));
+        //tmusic_params. = VisualSettingGlobals.getPixels(5,scale);
+        timeMusic.setLayoutParams(tmusic_params);
+        timeMusic.setPadding(VisualSettingGlobals.getPixels(7,scale),0, VisualSettingGlobals.getPixels(8,scale), 0);
+        timeMusic.setImageDrawable(music_drawable);
+        timeMusic.setBackgroundColor(ContextCompat.getColor (context, R.color.rednote));
+
+
 
         setTime(0,0,0);
 
@@ -137,23 +163,10 @@ public class TimeLinearLayout extends LinearLayout {
         items_container.addView(timeDraggable);
         items_container.addView(timeDescription);
         items_container.addView(timeCountdownView);
+        items_container.addView(timeMusic);
+
 
         items_container.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
-        //RelativeLayout.LayoutParams draggable_params = (RelativeLayout.LayoutParams) timeDraggable.getLayoutParams();
-        //RelativeLayout.LayoutParams description_params = (RelativeLayout.LayoutParams) timeDescription.getLayoutParams();
-        //RelativeLayout.LayoutParams countdown_params = (RelativeLayout.LayoutParams) timeCountdownView.getLayoutParams();
-
-        //draggable_params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        //timeDraggable.setLayoutParams(draggable_params);
-
-        //description_params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        //description_params.addRule(RelativeLayout.RIGHT_OF, R.id.time_draggable);
-        //timeDescription.setLayoutParams(description_params);
-
-        //countdown_params.addRule(RelativeLayout.RIGHT_OF, R.id.time_description);
-        //timeCountdownView.setLayoutParams(countdown_params);
-
 
 
         this.addView(items_container);
@@ -189,6 +202,9 @@ public class TimeLinearLayout extends LinearLayout {
 
     public void setCountdownListener(OnTouchListener listener){
         timeCountdownView.setOnTouchListener(listener);
+    }
+    public void setMusicListener(OnTouchListener listener){
+        timeMusic.setOnTouchListener(listener);
     }
 
     public void setDescription(String description){

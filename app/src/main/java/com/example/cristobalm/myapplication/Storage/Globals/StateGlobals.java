@@ -24,5 +24,11 @@ public class StateGlobals {
     public static final String CURRENT_INDEX = "current_index";
     public static final String UNIQUE_ID = "unique_id";
 
+    // sound
+    public static final String COMMON_SOUND = "common_sound";
+    public static final String FINISH_SOUND = "finish_sound";
+
+
+
 
 }

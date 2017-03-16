@@ -1,6 +1,9 @@
 package com.example.cristobalm.myapplication.UI.GreatTimePicker;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -129,6 +132,31 @@ public class GreatTimePicker extends FrameLayout {
         setCurrentHours(0);
         setCurrentMinutes(0);
         setCurrentSeconds(0);
+
+        setDividerColor(secondsPicker, Color.argb(50, 0, 0, 0));
+        setDividerColor(minutesPicker, Color.argb(50, 0, 0, 0));
+        setDividerColor(hoursPicker, Color.argb(50, 0, 0, 0));
+    }
+    private void setDividerColor(NumberPicker picker, int color) {
+
+        java.lang.reflect.Field[] pickerFields = NumberPicker.class.getDeclaredFields();
+        for (java.lang.reflect.Field pf : pickerFields) {
+            if (pf.getName().equals("mSelectionDivider")) {
+                pf.setAccessible(true);
+                try {
+                    ColorDrawable colorDrawable = new ColorDrawable(color);
+                    pf.set(picker, colorDrawable);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
     }
 
 

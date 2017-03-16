@@ -221,7 +221,7 @@ class ButtonAction {
 
     }
     private void onClickButtonRepeat(){
-        main_activity.reloadList();
+        //main_activity.reloadList();
         if(main_activity.mService == null){
             return;
         }
