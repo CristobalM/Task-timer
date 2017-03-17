@@ -5,6 +5,7 @@ import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
@@ -34,6 +35,7 @@ class ServiceCountdown {
                 if(timefield != null && timefield.getTimeLinearLayout() != null) {
                     timefield.getTimeLinearLayout().setTime(to_record);
                 }
+                /*
                 String _description = null;
                 if(timefield != null){
                     _description = timefield.getCustomText();
@@ -46,6 +48,19 @@ class ServiceCountdown {
                             -1
 
                     );
+                }
+                */
+                if(mService!= null && mService.viewNotification != null) {
+                    if(timefield.getCustomText().length() > 0) {
+                        mService.viewNotification.setTextViewText(R.id.description_text_notif, timefield.getCustomText());
+                    }else{
+                        mService.viewNotification.setTextViewText(R.id.description_text_notif, timefield.getHint());
+
+                    }
+                    mService.viewNotification.setTextViewText(R.id.countdown_text, TimeContainer.getTimeString(to_record));
+                    mService.reloadViewNotification();
+                }else{
+                    Log.e("ServiceCountdown", "LA WEA NO FUNCIONA QLO");
                 }
             }
 

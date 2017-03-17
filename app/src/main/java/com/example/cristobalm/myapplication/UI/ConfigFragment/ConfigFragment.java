@@ -61,6 +61,9 @@ public class ConfigFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 timingService.processChange(configDialog.applyToAllChecked());
+                if(timingService != null){
+                    timingService.changeDone();
+                }
             }
         });
 

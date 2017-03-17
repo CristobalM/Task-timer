@@ -112,6 +112,7 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
         timefield.setTime(millis);
         mService.setMillisEditing(-1);
         mService.setOffOpeningDialogFragment();
+        mService.changeDone();
     }
     public void onCancel(DialogInterface dialog){
         mService.setOffOpeningDialogFragment();

@@ -84,5 +84,12 @@ public class InfoNameGlobals {
     public static final int SOUND_FINISHING = 0;
     public static final int SOUND_COMMON = 1;
 
+    // notification buttons actions
+    public static final String NOTIF_BUTTON = "NOTIF_BUTTON";
+    public static final int PLAY_NOTIF = 0;
+    public static final int PAUSE_NOTIF = 1;
+    public static final int STOP_NOTIF = 2;
+
+
 
 }

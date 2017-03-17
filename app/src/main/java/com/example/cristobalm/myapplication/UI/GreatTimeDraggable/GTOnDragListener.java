@@ -59,6 +59,9 @@ public class GTOnDragListener implements View.OnDragListener {
                 timeLinearLayout.restoreNotDragState();
                 mainActivity.moveTimefield(timefield.getStatic_index(), result);
                 v.invalidate();
+                if(mainActivity.mService != null){
+                    mainActivity.mService.changeDone();
+                }
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
                 //timeLinearLayout.changeBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorDescription));

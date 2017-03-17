@@ -23,11 +23,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.ConfigFragment.ConfigOnTouchListener;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.R;
+import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
@@ -101,11 +103,48 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void playTimer(){
+        if(getState() == MainStateGlobals.STATE_RUNNING ||
+                getTime_fields().size() <= 0){
+            return;
+        }
+
+        if(mService.getTotalSeconds() <= 0){
+            Toast.makeText(this, "Please, total time must be greater than zero", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        switch (getState()){
+            case MainStateGlobals.STATE_PAUSED:
+                mService.unPauseTimer();
+                break;
+            case MainStateGlobals.STATE_IDLE:
+                ArrayList<Integer> millisecondsList = getMillisecondsList();
+                Intent intent = new Intent(getApplicationContext(), TimingService.class);
+                intent.putIntegerArrayListExtra(InfoNameGlobals.REPEAT_TIME_LIST, millisecondsList);
+                intent.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.START_TIMING);
+                startService(intent);
+                mService.startTimer();
+        }
+
+        blockInputs();
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE)).setVisibility(View.VISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).setVisibility(View.INVISIBLE);
+        getState();
+        //main_activity.saveState();
+        if(mService != null){
+            mService.changeForce();
+        }
+    }
 
     public void pauseTimer(){
         if(mService == null){
             return;
         }
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE)).setVisibility(View.INVISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).setVisibility(View.VISIBLE);
+
         mService.pauseTimer();
     }
 
@@ -119,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView button_play = buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY ));
         ImageView button_pause =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE));
         ImageView button_add =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD));
+        ImageView button_stop =  buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP));
         button_play.setVisibility(View.VISIBLE);
         button_pause.setVisibility(View.INVISIBLE);
         button_add.getBackground().clearColorFilter();
@@ -281,8 +321,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reloadButtonStates(){
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        if(getState() == MainStateGlobals.STATE_IDLE) {
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        }else{
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().clearColorFilter();
 
+        }
         if(time_fields.size() <= 0){
             buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }else{
@@ -310,7 +354,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
-        saveState();
+        if(mService != null) {
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -320,6 +365,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         super.onDestroy();
+    }
+    @Override
+    protected void onPause(){
+        saveState();
+        super.onPause();
     }
 
     public void blockInputs(){
@@ -433,9 +483,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d("saveState","Saving state #"+state);
         }
         */
-        if(mService != null && false){
+        if(mService != null){
             //mService.saveFile();
-            mService.saveAll();
+            mService.changeForce();
         }
     }
 

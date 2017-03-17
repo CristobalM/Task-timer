@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
@@ -27,11 +30,13 @@ import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListDialog;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListItemInfo;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
+
 
 import org.w3c.dom.Node;
 
@@ -90,6 +95,43 @@ public class TimingService extends Service {
     Integer to_load_music_id;
     Timefield to_load_music_timefield;
 
+
+    boolean saveBeingCalled = false;
+    long last_change_done;
+
+
+    public void changeDone(){
+        last_change_done = System.currentTimeMillis();
+        if(!saveBeingCalled){
+            trySave();
+            saveBeingCalled = true;
+        }
+    }
+    public void changeForce(){
+        saveBeingCalled = false;
+        saveAll();
+    }
+
+    public void trySave(){
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        //Log.i("tag", "This'll run 300 milliseconds later");
+                        if(System.currentTimeMillis() - last_change_done > 500){
+                            saveAll();
+                            if(main_activity != null) {
+                                //Toast.makeText(main_activity, "Changes saved", Toast.LENGTH_SHORT).show();
+                            }
+                            saveBeingCalled = false;
+                        }else if(saveBeingCalled){
+                            trySave();
+                        }
+                    }
+                },
+                100);
+    }
+
+
     public void loadMusic(int music_id, Timefield _timefield){
         to_load_music_id = music_id;
         to_load_music_timefield = _timefield;
@@ -101,6 +143,7 @@ public class TimingService extends Service {
             to_load_music_timefield
                     .getTimeLinearLayout()
                     .setMusicColor(InfoNameGlobals.getSColorById(to_load_music_id));
+            changeDone();
         }
     }
 
@@ -131,10 +174,12 @@ public class TimingService extends Service {
         }else if(tempCommonSound != null){
             commonSound = tempCommonSound;
             tempCommonSound = null;
-            if(applyToAllChecked) {
-                setAllSoundsToCommon();
-            }
+
         }
+        if(applyToAllChecked) {
+            setAllSoundsToCommon();
+        }
+        changeDone();
     }
     public void setAllSoundsToCommon(){
         for(int i = 0; i < retrieveTimefields().size(); i++){
@@ -435,7 +480,7 @@ public class TimingService extends Service {
         }
         listItemInfoArrayList = null;
 
-
+        changeDone();
 
     }
 
@@ -568,26 +613,57 @@ public class TimingService extends Service {
         return mBinder;
     }
 
+    public void reloadViewNotification(){
+        if(foregroundNotification != null) {
+            timingNotifications.getNotificationManager().notify(1337, foregroundNotification);
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        String action = intent.getStringExtra(InfoNameGlobals.ACTION);
-        if(alarmManager == null){
-            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if(intent.hasExtra(InfoNameGlobals.NOTIF_BUTTON)){
+            int click_notif = intent.getIntExtra(InfoNameGlobals.NOTIF_BUTTON, -1);
+            switch (click_notif){
+                case InfoNameGlobals.PLAY_NOTIF:
+                    if(main_activity != null){
+                        main_activity.playTimer();
+                    }
+                    else{
+                        unPauseTimer();
+                    }
+
+                    break;
+                case InfoNameGlobals.PAUSE_NOTIF:
+                    if (main_activity != null) {
+                        main_activity.pauseTimer();
+                    } else {
+                        pauseTimer();
+                    }
+
+                    break;
+                case InfoNameGlobals.STOP_NOTIF:
+                    stopTimer();
+                    break;
+            }
         }
 
-        if(action.equals(InfoNameGlobals.START_TIMING)) {
-        }
-        else if(action.equals(InfoNameGlobals.STOP_TIMING)){
-        }
-        else if(action.equals(InfoNameGlobals.PAUSE_TIMING)){
+        if(intent.hasExtra(InfoNameGlobals.ACTION)) {
+            String action = intent.getStringExtra(InfoNameGlobals.ACTION);
+            if (alarmManager == null) {
+                alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            }
 
-        }
-        else if(action.equals(InfoNameGlobals.CONTINUE_TIMING)){
-            Log.d("onStartCommand", "Action is CONTINUE_TIMING!!");
-            continueTimer();
-        }
-        else if(action.equals(InfoNameGlobals.SHUTDOWN)){
-            saveAll();
+            if (action.equals(InfoNameGlobals.START_TIMING)) {
+            } else if (action.equals(InfoNameGlobals.STOP_TIMING)) {
+            } else if (action.equals(InfoNameGlobals.PAUSE_TIMING)) {
+
+            } else if (action.equals(InfoNameGlobals.CONTINUE_TIMING)) {
+                Log.d("onStartCommand", "Action is CONTINUE_TIMING!!");
+                continueTimer();
+            } else if (action.equals(InfoNameGlobals.SHUTDOWN)) {
+                saveAll();
+            }
         }
         return mStartMode;
     }
@@ -619,6 +695,10 @@ public class TimingService extends Service {
         alarmManager.cancel(pendingIntent);
         serviceCountdown.stopCountDown();
         setMainState(MainStateGlobals.STATE_PAUSED);
+        viewNotification.setViewVisibility(R.id.notif_button_pause, View.INVISIBLE);
+        viewNotification.setViewVisibility(R.id.notif_button_play, View.VISIBLE);
+        reloadViewNotification();
+
     }
     public void stopTimer(){
         Intent intent =  new Intent(this, TimeReceiver.class);
@@ -635,6 +715,8 @@ public class TimingService extends Service {
             main_activity.stopTimer();
         }
 
+        stopForeground(true);
+
     }
 
     public void setOnOpeningDialogFragment(){
@@ -645,7 +727,7 @@ public class TimingService extends Service {
             setOffWaitingForScheduled();
         }
         openingDialogDragment = false;
-        if(!waitingForScheduled && !waitingForScheduled){
+        if(!waitingForScheduled && !openingDialogDragment){
             stopSelf();
         }
     }
@@ -657,7 +739,7 @@ public class TimingService extends Service {
             setOffOpeningDialogFragment();
         }
         waitingForScheduled = false;
-        if(!waitingForScheduled && !waitingForScheduled){
+        if(!waitingForScheduled && !openingDialogDragment){
             stopSelf();
         }
     }
@@ -673,10 +755,45 @@ public class TimingService extends Service {
         //        "Continuing on iteration #"+current_timer_index+
         //                ". Total time: " + getTimeString(), -1, Notification.PRIORITY_HIGH);
         timerScheduling(-1);
+
+        // foreground test
+        viewNotification = new RemoteViews(getPackageName(), R.layout.notification);
+
+        Intent playIntent = new Intent(getApplicationContext(), TimingService.class);
+        Intent pauseIntent = new Intent(getApplicationContext(), TimingService.class);
+        Intent stopIntent = new Intent(getApplicationContext(), TimingService.class);
+
+        playIntent.putExtra(InfoNameGlobals.NOTIF_BUTTON, InfoNameGlobals.PLAY_NOTIF);
+        pauseIntent.putExtra(InfoNameGlobals.NOTIF_BUTTON, InfoNameGlobals.PAUSE_NOTIF);
+        stopIntent.putExtra(InfoNameGlobals.NOTIF_BUTTON, InfoNameGlobals.STOP_NOTIF);
+        PendingIntent play = PendingIntent.getService(getApplicationContext(), InfoNameGlobals.PLAY_NOTIF, playIntent, 0);
+        PendingIntent pause = PendingIntent.getService(getApplicationContext(), InfoNameGlobals.PAUSE_NOTIF, pauseIntent, 0);
+        PendingIntent stop = PendingIntent.getService(getApplicationContext(), InfoNameGlobals.STOP_NOTIF, stopIntent, 0);
+
+        viewNotification.setOnClickPendingIntent(R.id.notif_button_play, play);
+        viewNotification.setOnClickPendingIntent(R.id.notif_button_pause, pause);
+        viewNotification.setOnClickPendingIntent(R.id.notif_button_stop, stop);
+
+
+        foregroundNotification = timingNotifications.createNotification(
+                MainActivity.class,
+                "FOREGROUND TEST",
+                Notification.PRIORITY_DEFAULT,
+                viewNotification);
+        foregroundNotification.flags|=Notification.FLAG_NO_CLEAR;
+
+        startForeground(1337, foregroundNotification);
     }
+    RemoteViews viewNotification;
+    Notification foregroundNotification;
+
+
 
     public void unPauseTimer(){
         setMainState(MainStateGlobals.STATE_RUNNING);
+        viewNotification.setViewVisibility(R.id.notif_button_pause, View.VISIBLE);
+        viewNotification.setViewVisibility(R.id.notif_button_play, View.INVISIBLE);
+        reloadViewNotification();
 
         timerScheduling(getLastRemainingMillis());
     }

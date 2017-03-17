@@ -137,57 +137,32 @@ class ButtonAction {
     }
 
     private void onClickButtonStop(){
-        if(main_activity.getState() == MainStateGlobals.STATE_IDLE || main_activity.getTime_fields().size() <= 0){
+        if(main_activity == null || main_activity.getState() == MainStateGlobals.STATE_IDLE || main_activity.getTime_fields().size() <= 0){
             return;
         }
+
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
         if(main_activity.mService!=null) {
-            Intent intent = new Intent(main_activity, TimingService.class);
             main_activity.mService.stopTimer();
         }
-
-
-
-
     }
     private void onClickButtonPlay(){
+        if(main_activity != null){
+            main_activity.playTimer();
+        }
         if(main_activity.getState() == MainStateGlobals.STATE_RUNNING ||
                 main_activity.getTime_fields().size() <= 0){
             return;
         }
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
-        if(main_activity.mService.getTotalSeconds() <= 0){
-            Toast.makeText(main_activity, "Please, total time must be greater than zero", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        switch (main_activity.getState()){
-            case MainStateGlobals.STATE_PAUSED:
-                main_activity.mService.unPauseTimer();
-                break;
-            case MainStateGlobals.STATE_IDLE:
-                ArrayList<Integer> millisecondsList = main_activity.getMillisecondsList();
-                Intent intent = new Intent(context, TimingService.class);
-                intent.putIntegerArrayListExtra(InfoNameGlobals.REPEAT_TIME_LIST, millisecondsList);
-                intent.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.START_TIMING);
-                context.startService(intent);
-                main_activity.mService.startTimer();
-        }
-
-        main_activity.blockInputs();
-        main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PAUSE)).setVisibility(View.VISIBLE);
-        //main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-        button.setVisibility(View.INVISIBLE);
-        main_activity.getState();
-        main_activity.saveState();
     }
     private void onClickButtonPause(){
+        if(main_activity == null || main_activity.mService == null){
+            return;
+        }
         button.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-        main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).setVisibility(View.VISIBLE);
-        button.setVisibility(View.INVISIBLE);
 
         main_activity.pauseTimer();
         main_activity.getState();
@@ -218,7 +193,9 @@ class ButtonAction {
             main_activity.buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().clearColorFilter();
         }
 
-
+        if(main_activity != null && main_activity.mService != null){
+            main_activity.mService.changeDone();
+        }
     }
     private void onClickButtonRepeat(){
         //main_activity.reloadList();
@@ -233,6 +210,9 @@ class ButtonAction {
         }
         main_activity.mService.saveRepeatState(!repeat);
         Log.d("onClickButtonRepeat", "saved repeat state:"+!repeat);
+        if(main_activity != null && main_activity.mService != null){
+            main_activity.mService.changeDone();
+        }
     }
 
 

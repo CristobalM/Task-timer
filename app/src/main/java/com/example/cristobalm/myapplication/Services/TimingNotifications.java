@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.widget.RemoteViews;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
@@ -30,7 +31,7 @@ public class TimingNotifications {
         this.notificationManager = (NotificationManager) context.getSystemService(Service.NOTIFICATION_SERVICE);
     }
 
-    private Notification createNotification (Class target_activity_class, String text_notif, int priority){
+    public Notification createNotification (Class target_activity_class, String text_notif, int priority, RemoteViews remoteViews){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_clocklogo_more_contrast )
                 .setContentTitle("Task Timing")
@@ -38,6 +39,9 @@ public class TimingNotifications {
                 .setPriority(priority)
                 //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setLights(Color.RED, 3000, 3000);
+        if(remoteViews != null){
+            mBuilder.setContent(remoteViews);
+        }
 
         Intent targetIntent = new Intent(context, target_activity_class);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -47,7 +51,7 @@ public class TimingNotifications {
     }
 
     public void sendNotification(int nID, Class target_activity_class, String text_notif, int notification_sound, int priority){
-        Notification notification = createNotification(target_activity_class, text_notif, priority);
+        Notification notification = createNotification(target_activity_class, text_notif, priority, null);
         notification.defaults = Notification.DEFAULT_LIGHTS;
 
         if(notification_sound > -1) {
@@ -67,6 +71,10 @@ public class TimingNotifications {
         String text = "On " + description +
                 ", remaining time: " + TimeContainer.getTimeString(millis);
         sendNotification(nID, MainActivity.class, text, notification_sound, Notification.PRIORITY_DEFAULT);
+    }
+
+    public NotificationManager getNotificationManager(){
+        return notificationManager;
     }
 
 

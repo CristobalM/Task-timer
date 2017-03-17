@@ -63,6 +63,10 @@ public class Timefield {
         }
     }
 
+    public String getHint(){
+        return "Task " + String.valueOf(index+1);
+    }
+
     public void setTime(int milliseconds){
         time_container.setMilliseconds(milliseconds);
     }
@@ -139,6 +143,7 @@ public class Timefield {
         this.timeLinearLayout.setTime(0,0,0);
         startTimefieldView(main_activity);
     }
+
     public void setHint(int hint){
         this.timeLinearLayout.setHint(hint+1);
     }

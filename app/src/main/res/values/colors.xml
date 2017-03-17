@@ -29,6 +29,9 @@
 
     <color name="rednote">#501c00</color>
 
+    <color name="redbackgroundNotif">#c40909</color>
+    <color name="redbackgroundCountdownNotif">#750000</color>
+
 
 
 </resources>

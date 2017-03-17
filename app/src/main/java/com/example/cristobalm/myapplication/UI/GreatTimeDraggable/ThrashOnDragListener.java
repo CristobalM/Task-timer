@@ -52,6 +52,9 @@ public class ThrashOnDragListener implements View.OnDragListener {
                 }
                 mainActivity.removeTimeField(result);
                 v.invalidate();
+                if(mainActivity != null && mainActivity.mService != null) {
+                    mainActivity.mService.changeDone();
+                }
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
                 mainActivity.hideThrashCan();

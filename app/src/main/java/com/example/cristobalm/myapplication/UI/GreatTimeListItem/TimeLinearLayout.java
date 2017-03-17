@@ -11,6 +11,7 @@ import android.text.InputType;
 import android.text.method.KeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.Menu;
@@ -122,6 +123,7 @@ public class TimeLinearLayout extends LinearLayout {
         timeCountdownView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorCountdownBackground));
         timeCountdownView.setTextColor(ContextCompat.getColor(context, R.color.colorWhite));
         timeCountdownView.setGravity(Gravity.CENTER);
+        timeCountdownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         if(retrieveFont != null) {
             timeCountdownView.setTypeface(retrieveFont);
         }
@@ -213,6 +215,9 @@ public class TimeLinearLayout extends LinearLayout {
     }
     public void setHint(int hint){
         timeDescription.setHint("Task " + String.valueOf(hint) + " (Touch to edit)");
+    }
+    public String getHint(){
+        return timeDescription.getHint().toString();
     }
 
     public void stopEditables(){

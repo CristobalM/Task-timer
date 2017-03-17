@@ -20,6 +20,7 @@ public class TitleChangeListener implements TextWatcher {
     public void afterTextChanged(Editable s){
         //Log.d("afterTextChanged", "s is:"+s.toString());
         timingService.setTitle(s.toString());
+        timingService.changeDone();
     }
 
     @Override
