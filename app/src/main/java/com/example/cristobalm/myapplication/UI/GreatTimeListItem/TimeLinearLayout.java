@@ -51,7 +51,15 @@ public class TimeLinearLayout extends LinearLayout {
 
     private float scale;
 
+    public void resetMusicBackgroudColor(){
+        timeMusic.getBackground().clearColorFilter();
+        timeMusic.invalidate();
+    }
 
+    public void musicBackgroundColor(int color){
+        timeMusic.getBackground().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        timeMusic.invalidate();
+    }
     public void setMusicColor(int color){
         timeMusic.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         timeMusic.invalidate();

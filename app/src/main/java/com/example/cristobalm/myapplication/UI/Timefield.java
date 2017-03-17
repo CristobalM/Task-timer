@@ -119,8 +119,7 @@ public class Timefield {
 
                         MusicFragment musicFragment = MusicFragment.newInstance(main_activity.mService, getMe());
                         musicFragment.show(main_activity.getFragmentManager(), "musicPicker");
-
-
+                        timeLinearLayout.musicBackgroundColor(R.color.onTouchMusicIcon);
 
                     }
                     break;
@@ -173,7 +172,7 @@ public class Timefield {
 
 
 
-        timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout.getTimeDraggable(), main_activity));
+        timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout, main_activity));
         timeLinearLayout.setOnDragListener(new GTOnDragListener(timeLinearLayout, main_activity, this));
 
         tllRunnable = new TLLRunnable(timeLinearLayout, main_activity.getScrollView());

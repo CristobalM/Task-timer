@@ -74,6 +74,7 @@ public class MusicFragment extends DialogFragment {
                 if(timefield != null) {
                     timingService.startLoadMusic();
                     timingService.loadMusic(0, null);
+                    timefield.getTimeLinearLayout().resetMusicBackgroudColor();
                 }else{
                     int color = -1;
 
@@ -101,6 +102,7 @@ public class MusicFragment extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 if(timefield != null) {
                     timingService.loadMusic(0, null);
+                    timefield.getTimeLinearLayout().resetMusicBackgroudColor();
                 }
             }
         });
@@ -110,6 +112,9 @@ public class MusicFragment extends DialogFragment {
     }
     public void onCancel(DialogInterface dialog){
         timingService.setOffOpeningDialogFragment();
+        if(timefield != null){
+            timefield.getTimeLinearLayout().resetMusicBackgroudColor();
+        }
 
         super.onCancel(dialog);
     }

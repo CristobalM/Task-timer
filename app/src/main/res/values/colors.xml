@@ -32,6 +32,8 @@
     <color name="redbackgroundNotif">#c40909</color>
     <color name="redbackgroundCountdownNotif">#750000</color>
 
+    <color name="onTouchMusicIcon">#1e1a1a</color>
+
 
 
 </resources>
