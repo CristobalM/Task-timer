@@ -15,7 +15,6 @@ import com.example.cristobalm.myapplication.UI.MainActivity;
 public class TimeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent){
-        Log.d("TimeReceiver.onReceive", "called !!!");
         Intent next_iter = new Intent(context, TimingService.class);
         next_iter.putExtra(InfoNameGlobals.ACTION, InfoNameGlobals.CONTINUE_TIMING);
         context.startService(next_iter);

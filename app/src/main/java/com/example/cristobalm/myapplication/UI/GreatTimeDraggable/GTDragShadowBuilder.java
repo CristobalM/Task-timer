@@ -37,7 +37,7 @@ public class GTDragShadowBuilder extends View.DragShadowBuilder {
         height = getView().getHeight();
 
         size.set(width, height);
-        touch.set(0, height/2);
+        touch.set(width/2, height/2);
 
         try{
             snapshot = Bitmap.createBitmap(view.getDrawingCache(), 0, 0, width, height);
@@ -48,7 +48,10 @@ public class GTDragShadowBuilder extends View.DragShadowBuilder {
         }
 
         shadow.setBounds(0, 0, width, height);
+    }
 
+    public Drawable getShadow(){
+        return shadow;
     }
 
     @Override

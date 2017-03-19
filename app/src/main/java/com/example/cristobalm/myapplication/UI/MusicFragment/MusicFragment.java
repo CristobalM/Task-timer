@@ -1,9 +1,11 @@
 package com.example.cristobalm.myapplication.UI.MusicFragment;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -107,7 +109,13 @@ public class MusicFragment extends DialogFragment {
             }
         });
 
-        return selectMusicDialog.create();
+
+        AlertDialog to_return = selectMusicDialog.create();
+        if(to_return != null && to_return.getWindow() != null) {
+            to_return.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        return to_return;
 
     }
     public void onCancel(DialogInterface dialog){

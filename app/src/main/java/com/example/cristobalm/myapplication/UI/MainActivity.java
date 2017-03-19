@@ -1,16 +1,18 @@
 package com.example.cristobalm.myapplication.UI;
 
+import android.content.ClipDescription;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,22 +20,19 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Services.TimingService;
-import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.UI.ConfigFragment.ConfigOnTouchListener;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
+import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashCan;
 import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.ThrashOnDragListener;
-import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
-import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListOnTouchListener;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListsLayout;
 import com.example.cristobalm.myapplication.UI.ListFragment.NewFileOnTouchListener;
@@ -41,7 +40,7 @@ import com.example.cristobalm.myapplication.UI.ListFragment.TitleChangeListener;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -71,6 +70,158 @@ public class MainActivity extends AppCompatActivity {
 
     TextView title_list;
 
+
+    public boolean isViewVisible(View _view){
+        Rect scrollBounds = new Rect();
+        scrollView.getDrawingRect(scrollBounds);
+
+        float top = _view.getY();
+        float bottom = top+ _view.getHeight();
+        if(scrollBounds.top < top && scrollBounds.bottom > bottom){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public class scrollRunnable implements  Runnable{
+        AtomicBoolean _is_done;
+        int direction;
+        ScrollView _sview;
+        scrollRunnable(AtomicBoolean _is_done, ScrollView _sview, int direction){
+            this._is_done = _is_done;
+            this.direction = direction;
+            this._sview = _sview;
+        }
+        public void run() {
+            if(! _is_done.get()){
+                if(mService != null) {
+                    View child;
+                    if(direction == 1) {
+                        child = mService.getTFAt(mService.retrieveTimefields().size() - 1).getTimeLinearLayout();
+                        is_done_s_top.set(true);
+
+                    }else{
+                        child = mService.getTFAt(0).getTimeLinearLayout();
+                        is_done_s_bottom.set(true);
+                    }
+                    if(!isViewVisible(child)) {
+                        Log.e("scrollrunable", "trying to scroll!!!");
+                        _sview.smoothScrollBy(0, _px(5) * direction);
+                        didScrollingStop(_is_done, _sview, direction);
+
+                    }else{
+                        _is_done.set(true);
+                    }
+                }
+
+            }
+        }
+    }
+
+    public class CheckIfFinishedScrolling implements Runnable{
+        AtomicBoolean _is_done;
+        int direction;
+        ScrollView _sview;
+        CheckIfFinishedScrolling(AtomicBoolean _is_done, ScrollView _sview, int direction){
+            this._is_done = _is_done;
+            this.direction = direction;
+            this._sview = _sview;
+        }
+        @Override
+        public void run() {
+            int new_pos = getScrollView().getScrollY();
+            if(_last_scroll_ != null && new_pos == _last_scroll_){
+                //done
+                did_scrolling_stop = true;
+                timeOutScroll(_is_done, _sview, direction);
+            }
+            else{
+                _last_scroll_ = new_pos;
+                didScrollingStop(_is_done, _sview, direction);
+            }
+        }
+    }
+
+    Integer _last_scroll_;
+    Boolean  did_scrolling_stop;
+    public synchronized void didScrollingStop(AtomicBoolean _is_done, ScrollView _sview, int direction){
+        if(getScrollView() == null){
+            return;
+        }
+        new android.os.Handler().postDelayed(
+                new CheckIfFinishedScrolling(_is_done, _sview, direction),
+                5);
+    }
+
+
+
+
+
+    public void timeOutScroll(AtomicBoolean _is_done, ScrollView _sview, int direction){
+        new android.os.Handler().postDelayed(
+                new scrollRunnable(_is_done, _sview, direction),
+                5);
+    }
+
+    public class ScrollerListener implements View.OnDragListener{
+        int direction;
+        AtomicBoolean _is_done;
+        ScrollerListener(int direction, AtomicBoolean _is_done){
+            this.direction = direction;
+            this._is_done = _is_done;
+        }
+        public boolean onDrag(View v, DragEvent event) {
+            final int action = event.getAction();
+
+            switch (action) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT) && current_state != MainStateGlobals.STATE_RUNNING) {
+                        _is_done.set(false);
+                        v.invalidate();
+                        return true;
+                    }
+                    return false;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    _is_done.set(false);
+                    timeOutScroll(_is_done, getScrollView(), direction);
+                    return true;
+
+                case DragEvent.ACTION_DRAG_LOCATION:
+                    return true;
+
+                case DragEvent.ACTION_DROP:
+                    _is_done.set(true);
+                    reloadList();
+                    return true;
+
+                case DragEvent.ACTION_DRAG_EXITED:
+                    _is_done.set(true);
+                    return true;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    _is_done.set(true);
+                    reloadList();
+                    return true;
+            }
+            _is_done.set(true);
+            return false;
+        }
+    }
+    ImageView schecker_top;
+    ImageView schecker_bottom;
+    AtomicBoolean is_done_s_top;
+    AtomicBoolean is_done_s_bottom;
+    public void startScrollCheckers(){
+        is_done_s_bottom = new AtomicBoolean();
+        is_done_s_top = new AtomicBoolean();
+        is_done_s_bottom.set(true);
+        is_done_s_top.set(true);
+        schecker_top = (ImageView) findViewById(R.id.top_scroller);
+        schecker_bottom = (ImageView) findViewById(R.id.bottom_scroller);
+        schecker_top.setOnDragListener(new ScrollerListener(-1, is_done_s_top));
+        schecker_bottom.setOnDragListener(new ScrollerListener(1, is_done_s_bottom));
+    }
+
     public ListsLayout getListsLayout(){
         if(listsLayout == null){
             listsLayout = new ListsLayout(this);
@@ -83,12 +234,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
+    public int _px(int dp){
+        return VisualSettingGlobals.getPixels(dp, getResources().getDisplayMetrics().density);
+    }
 
     public ScrollView getScrollView(){
         if(scrollView == null) {
-         scrollView = (ScrollView) findViewById(R.id.ScrollView);
+            scrollView = (ScrollView) findViewById(R.id.ScrollView);
         }
         return scrollView;
     }
@@ -110,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(mService.getTotalSeconds() <= 0){
-            Toast.makeText(this, "Please, total time must be greater than zero", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.total_time_greater_than_zero, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -199,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                     time_fields.remove(source.getIndex()));
             reloadList();
         }else{
-            Toast.makeText(getApplicationContext(), "Some error occurred during dragging operation", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.dragging_error, Toast.LENGTH_LONG).show();
         }
     }
     public void removeTimeField(int static_which){
@@ -310,6 +462,7 @@ public class MainActivity extends AppCompatActivity {
 
         reloadButtonStates();
         reloadCurrentTitle();
+        startScrollCheckers();
 
     }
 
@@ -322,13 +475,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void reloadButtonStates(){
         if(getState() == MainStateGlobals.STATE_IDLE) {
-            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
         }else{
             buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().clearColorFilter();
 
         }
         if(time_fields.size() <= 0){
-            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
         }else{
             buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().clearColorFilter();
         }
@@ -376,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < time_fields.size(); i++){
             getTFAt(i).blockInput();
         }
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);  // setVisibility(View.INVISIBLE);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);  // setVisibility(View.INVISIBLE);
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().clearColorFilter();  // setVisibility(View.INVISIBLE);
         enabled_inputs = false;
 
@@ -386,7 +539,7 @@ public class MainActivity extends AppCompatActivity {
             getTFAt(i).enableInput();
         }
         buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_ADD)).getBackground().clearColorFilter(); // .setVisibility(View.VISIBLE);
-        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_STOP)).getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
 
         enabled_inputs = true;
     }
@@ -452,10 +605,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void reloadList(){
+    public synchronized void reloadList(){
         et_list.removeAllViews();
         if(time_fields.size() <= 0) {
-            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            buttons.get(ButtonNameGlobals.getIndexByName(ButtonNameGlobals.BUTTON_PLAY)).getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
         }
         for (int i = 0; i < time_fields.size(); i++) {
             Timefield selected_timefield = getTFAt(i);

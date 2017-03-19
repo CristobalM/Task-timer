@@ -50,11 +50,4 @@ public class ListsLayout extends RelativeLayout {
         this.addView(scrollView);
     }
 
-    public void addItemToList(ListItem listItem){
-        linearLayout.addView(listItem);
-    }
-    public void removeItemFromList(ListItem listItem){
-        linearLayout.removeView(listItem);
-    }
-
 }

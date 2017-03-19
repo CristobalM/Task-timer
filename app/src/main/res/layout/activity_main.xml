@@ -29,17 +29,20 @@
             android:layout_marginTop="15dp"/>
             <!--android:layout_below="@id/ads" />-->
 
-        <EditText
+        <com.example.cristobalm.myapplication.UI.TitleText
             android:id="@+id/title_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/logo"
             android:textSize="25dp"
             android:background="@color/transparent_all"
-            android:hint="Filename (Touch to edit)"
+            android:hint="Sequence"
             android:layout_marginTop="7dp"
             android:layout_marginLeft="15dp"
             android:paddingBottom="2dp"
+            android:maxLines="1"
+            android:textColor="@color/white_some_transparency"
+            android:inputType="textCapSentences"
             />
 
     </RelativeLayout>
@@ -113,22 +116,31 @@
 
     </RelativeLayout>
 
+        <ImageView
+            android:id="@+id/top_scroller"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/transparent_all"
+            android:layout_below="@id/buttons_layout"
+            />
+
         <ScrollView
             android:textColor="@android:color/black"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/ScrollView"
-            android:layout_marginTop="30dp"
-            android:layout_below="@+id/buttons_layout"
-            android:layout_above="@+id/selection_bar"
+            android:layout_below="@+id/top_scroller"
+            android:layout_above="@+id/bottom_scroller"
             >
 
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:id="@+id/et_list"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
 
                 />
         </ScrollView>
@@ -147,44 +159,63 @@
 
         />
 
+    <ImageView
+        android:id="@+id/bottom_scroller"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/transparent_all"
+        android:layout_above="@+id/selection_bar"
+        />
+
 
     <RelativeLayout
         android:id="@+id/selection_bar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/colorBlack"
-
+        android:gravity="center_vertical"
 
         >
         <ImageView
             android:id="@+id/new_file"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_sunuevo"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="20dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
             android:layout_centerVertical="true"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+
 
             />
 
         <ImageView
             android:id="@+id/open_files"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_lists"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             />
         <ImageView
             android:id="@+id/open_config"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_config"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
-
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             />
 
     </RelativeLayout>

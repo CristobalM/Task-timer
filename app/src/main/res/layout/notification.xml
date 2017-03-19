@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:gravity="center_vertical"
-    android:background="@color/redbackgroundNotif"
+    android:background="@color/colorBackground"
     >
 
     <TextView
@@ -11,11 +11,12 @@
         android:layout_height="match_parent"
         android:textColor="@color/colorWhite"
         android:layout_toLeftOf="@+id/countdown_text"
-        android:layout_marginRight="20dp"
+        android:paddingRight="20dp"
         android:gravity="center"
-        android:layout_marginLeft="15dp"
-        android:layout_marginBottom="5dp"
+        android:paddingLeft="15dp"
+        android:paddingBottom="5dp"
         android:textSize="12sp"
+        android:background="@color/transparent"
         />
 
     <TextView
@@ -26,9 +27,7 @@
         android:textColor="@color/colorWhite"
         android:layout_toLeftOf="@+id/notif_button_play"
         android:layout_toStartOf="@id/notif_button_play"
-        android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp"
-        android:background="@color/redbackgroundCountdownNotif"
+        android:background="@color/white_more_transparency"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
@@ -45,8 +44,7 @@
         android:src="@drawable/ic_play"
         android:layout_toLeftOf="@+id/notif_button_stop"
         android:padding="15dp"
-
-
+        android:background="@color/whiteTransparent"
         />
 
     <ImageView
@@ -57,6 +55,8 @@
         android:visibility="visible"
         android:layout_toLeftOf="@+id/notif_button_stop"
         android:padding="15dp"
+        android:background="@color/whiteTransparent"
+
 
 
         />
@@ -68,7 +68,8 @@
         android:src="@drawable/ic_stop"
         android:layout_alignParentRight="true"
         android:padding="15dp"
-        android:layout_marginRight="15dp"
+        android:background="@color/whiteTransparent"
+
 
         />
 

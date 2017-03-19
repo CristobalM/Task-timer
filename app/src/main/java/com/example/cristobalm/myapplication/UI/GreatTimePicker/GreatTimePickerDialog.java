@@ -73,7 +73,6 @@ public class GreatTimePickerDialog extends AlertDialog.Builder
 
 
         greatTimePicker.setOnTimeChangedListener(this);
-        Log.d("GreatTimePickerDialog", "set GreatTimePickerDialog as listener");
         setView(view);
 
 

@@ -5,4 +5,14 @@
     <string name="cancel">Cancel</string>
     <string name="apply">Apply</string>
 
+
+    <string name="sequence_delete_warning1">Please open other sequence first</string>
+    <string name="new_file_created">New file created</string>
+    <string name="dragging_error">Some error occurred during dragging action</string>
+    <string name="total_time_greater_than_zero">Please, total time must be greater than zero</string>
+    <string name="finished_countdowns_repeating">Finished all countdowns.. Repeating</string>
+    <string name="finished_countdowns">Finished all countdowns.. Repeating</string>
+    <string name="select_sequence_to_open">Select sequence to open</string>
+    <string name="pick_task_time">Select task time</string>
+
 </resources>

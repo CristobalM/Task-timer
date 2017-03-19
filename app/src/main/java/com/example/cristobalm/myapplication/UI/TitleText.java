@@ -1,41 +1,37 @@
-package com.example.cristobalm.myapplication.UI.GreatTimeListItem;
+package com.example.cristobalm.myapplication.UI;
 
 import android.content.ClipDescription;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Build;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 
 import com.example.cristobalm.myapplication.R;
-import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
 
 /**
- * Created by cristobalm on 3/4/17.
- * Edit text for each item
+ * Created by cristobalm on 3/18/17.
  */
 
-public class TimeDescription extends AppCompatEditText {
+public class TitleText extends AppCompatEditText {
 
     AttributeSet attrs;
 
     private float scale;
 
 
-    public TimeDescription(Context context){
+    public TitleText(Context context){
         super(context);
         init();
     }
-    public TimeDescription(Context context, AttributeSet attrs, int defStyle){
+    public TitleText(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         this.attrs = attrs;
         init();
 
     }
-    public TimeDescription(Context context, AttributeSet attrs){
+    public TitleText(Context context, AttributeSet attrs){
         super(context, attrs);
         this.attrs = attrs;
         init();
@@ -44,17 +40,6 @@ public class TimeDescription extends AppCompatEditText {
     protected void init(){
         scale = getResources().getDisplayMetrics().density;
         setFocusableInTouchMode(true);
-        int color_bar;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            color_bar = getResources().getColor(R.color.upbar, null);
-
-        }
-        else{
-            color_bar = getResources().getColor(R.color.upbar);
-        }
-
-
-        setWillNotDraw(false);
     }
 
     @Override
@@ -73,6 +58,4 @@ public class TimeDescription extends AppCompatEditText {
         }
     }
 
-
 }
-

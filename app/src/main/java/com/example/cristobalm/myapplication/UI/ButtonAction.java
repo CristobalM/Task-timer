@@ -4,21 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.R;
-import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
-import com.example.cristobalm.myapplication.Services.TimingService;
 import com.example.cristobalm.myapplication.UI.Globals.ButtonNameGlobals;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 
 /**
@@ -59,7 +56,7 @@ class ButtonAction {
                 break;
             case ButtonNameGlobals.BUTTON_ADD:
                 if(main_activity.getState() != MainStateGlobals.STATE_IDLE){
-                    button.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    button.getBackground().setColorFilter(ContextCompat.getColor(main_activity.getApplicationContext(), R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
                 }
                 break;
             case ButtonNameGlobals.BUTTON_REPEAT:
@@ -119,7 +116,7 @@ class ButtonAction {
 
     private void stopUp(){
         //button.getBackground().clearColorFilter();
-        button.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        button.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.light_gray_a), PorterDuff.Mode.MULTIPLY);
 
     }
     private void playUp(){

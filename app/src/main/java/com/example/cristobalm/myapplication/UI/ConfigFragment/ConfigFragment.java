@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -77,7 +78,12 @@ public class ConfigFragment extends DialogFragment {
         configDialog.setSoundFinishedListener(new ChangeMusicListener(InfoNameGlobals.SOUND_FINISHING, configDialog.getFinishedImageView()));
         configDialog.setSoundCommonListener(new ChangeMusicListener(InfoNameGlobals.SOUND_COMMON, configDialog.getCommonImageView()));
 
-        return configDialog.create();
+
+        AlertDialog to_return = configDialog.create();
+        if(to_return != null && to_return.getWindow() != null) {
+            to_return.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+        return to_return;
 
     }
     public void onCancel(DialogInterface dialog){

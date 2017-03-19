@@ -93,7 +93,9 @@ class ServiceCountdown {
         }
         this.timefield = timefield;
         if(timefield.getTimeLinearLayout().getTimeCountdownView() != null) {
-            this.timefield.getTimeLinearLayout().getTimeCountdownView().setBackgroundColor(Color.RED);
+            this.timefield.getTimeLinearLayout()
+                    .getTimeCountdownView()
+                    .setBackgroundColor(ContextCompat.getColor(mService.getApplicationContext(), R.color.colorCountdownBackgroundWorking));
 
             timefield.getTimeLinearLayout().getTimeCountdownView().invalidate();
         }

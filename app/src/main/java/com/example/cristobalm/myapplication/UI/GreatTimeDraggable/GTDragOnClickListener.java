@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
 import com.example.cristobalm.myapplication.UI.GreatTimeListItem.TimeLinearLayout;
@@ -26,7 +27,7 @@ public class GTDragOnClickListener implements View.OnTouchListener {
         this.mainActivity = mainActivity;
     }
 
-    public boolean onTouch(View v, MotionEvent event){
+    public  boolean onTouch(View v, MotionEvent event){
         if(mainActivity.current_state != MainStateGlobals.STATE_IDLE){
             return true;
         }
@@ -34,14 +35,23 @@ public class GTDragOnClickListener implements View.OnTouchListener {
         intent.putExtra(SOURCE_INDEX, source_index);
         ClipData.Item item = new ClipData.Item(intent);
         ClipData dragData = new ClipData(SOURCE_INDEX, new String[]{ClipDescription.MIMETYPE_TEXT_INTENT}, item);
-        View.DragShadowBuilder myShadow = new GTDragShadowBuilder(t_view, mainActivity.getApplicationContext());
+        GTDragShadowBuilder myShadow_b = new GTDragShadowBuilder(t_view, mainActivity.getApplicationContext());
+        if(mainActivity.mService != null){
+            mainActivity.mService.setCurrentShadowBuilder(myShadow_b);
+        }
+        View.DragShadowBuilder myShadow = myShadow_b;
         mainActivity.showThrashCan();
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
             v.startDragAndDrop(dragData, myShadow, null, 0);
         }
         else{
             v.startDrag(dragData, myShadow, null, 0);
         }
+        if(t_view.getParent() != null) {
+            ((ViewGroup)t_view.getParent() ).removeView(t_view);
+        }
+        mainActivity.mService.setCurrentMovingIndex(source_index);
 
         return true;
     }

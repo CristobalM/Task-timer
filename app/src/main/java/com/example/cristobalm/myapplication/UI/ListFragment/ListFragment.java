@@ -58,7 +58,9 @@ public class ListFragment extends DialogFragment {
         //listDialog.setView(timingService.getViewForDialog(getActivity(), listItemInfos));
 
         AlertDialog to_return = listDialog.create();
-        to_return.setTitle("Select file to open");
+        to_return.setView(listDialog.getView(), 0, 0, 0, 0);
+        to_return.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        //to_return.setTitle("Select sequence to open");
         return to_return;
     }
     public void onCancel(DialogInterface dialog){

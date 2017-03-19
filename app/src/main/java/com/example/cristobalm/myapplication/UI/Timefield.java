@@ -40,6 +40,7 @@ public class Timefield {
     private TimeContainer temp_time_container;
 
     TLLRunnable tllRunnable;
+    TLLRunnable tllRunnableBottom;
 
 
 
@@ -51,15 +52,22 @@ public class Timefield {
     public class TLLRunnable implements  Runnable{
         TimeLinearLayout tll;
         ScrollView sv;
-        TLLRunnable(TimeLinearLayout tll, ScrollView sv){
+        int top_bottom;
+        TLLRunnable(TimeLinearLayout tll, ScrollView sv, int top_bottom){
             this.tll = tll;
             this.sv = sv;
+            this.top_bottom = top_bottom;
         }
         @Override
         public void run(){
             Log.d("TLLRUNABLE", "SCROLLING! getBottom:"+ tll.getBottom());
             //
-            sv.scrollTo(0, tll.getTop() );
+            if(top_bottom == TimeLinearLayout.UP_DIRECTION){
+                sv.smoothScrollTo(0, tll.getTop() / 2);
+            }
+            else if(top_bottom == TimeLinearLayout.DOWN_DIRECTION){
+                sv.smoothScrollTo(0, tll.getBottom() / 2);
+            }
         }
     }
 
@@ -119,7 +127,7 @@ public class Timefield {
 
                         MusicFragment musicFragment = MusicFragment.newInstance(main_activity.mService, getMe());
                         musicFragment.show(main_activity.getFragmentManager(), "musicPicker");
-                        timeLinearLayout.musicBackgroundColor(R.color.onTouchMusicIcon);
+                        timeLinearLayout.musicBackgroundColor( R.color.onTouchMusicIcon);
 
                     }
                     break;
@@ -175,7 +183,8 @@ public class Timefield {
         timeLinearLayout.setDraggableClickListener(new GTDragOnClickListener(static_index, timeLinearLayout, main_activity));
         timeLinearLayout.setOnDragListener(new GTOnDragListener(timeLinearLayout, main_activity, this));
 
-        tllRunnable = new TLLRunnable(timeLinearLayout, main_activity.getScrollView());
+        tllRunnable = new TLLRunnable(timeLinearLayout, main_activity.getScrollView(), TimeLinearLayout.UP_DIRECTION);
+        tllRunnableBottom = new TLLRunnable(timeLinearLayout, main_activity.getScrollView(), TimeLinearLayout.DOWN_DIRECTION);
 
         timeLinearLayout.getTimeDescription().setOnTouchListener(new DescriptionTouchEvent(this));
 
@@ -189,6 +198,9 @@ public class Timefield {
 
     public void focusInScroll(){
         timeLinearLayout.post(tllRunnable);
+    }
+    public void focusInScrollDown(){
+        timeLinearLayout.post(tllRunnableBottom);
     }
 
     private void init(){

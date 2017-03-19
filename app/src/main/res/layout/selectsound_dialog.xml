@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
     android:gravity="center_horizontal"
@@ -12,8 +12,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:columnCount="3"
-        android:paddingRight="50dp"
-        android:paddingLeft="50dp"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+
 
         >
 
@@ -35,11 +36,13 @@
             android:id="@+id/sound_one"
             android:src="@drawable/ic_musical_note"
             android:layout_marginRight="50dp"
+            android:padding="10dp"
             />
 
         <ImageView
             android:id="@+id/sound_two"
             android:src="@drawable/ic_musical_note"
+            android:padding="10dp"
 
             />
 
@@ -47,6 +50,7 @@
             android:id="@+id/sound_three"
             android:src="@drawable/ic_musical_note"
             android:layout_marginLeft="50dp"
+            android:padding="10dp"
 
             />
 
@@ -61,14 +65,14 @@
             android:id="@+id/sound_four"
             android:src="@drawable/ic_musical_note"
             android:layout_marginRight="50dp"
-
+            android:padding="10dp"
 
             />
 
         <ImageView
             android:id="@+id/sound_five"
             android:src="@drawable/ic_musical_note"
-
+            android:padding="10dp"
 
             />
 
@@ -76,8 +80,7 @@
             android:id="@+id/sound_six"
             android:src="@drawable/ic_musical_note"
             android:layout_marginLeft="50dp"
-
-
+            android:padding="10dp"
 
             />
 
@@ -90,6 +93,7 @@
         <ImageView
             android:id="@+id/sound_seven"
             android:src="@drawable/ic_musical_note"
+            android:padding="10dp"
 
             />
 

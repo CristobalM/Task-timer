@@ -1,48 +1,35 @@
 package com.example.cristobalm.myapplication.Services;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cristobalm.myapplication.ObjectContainer.TimeContainer;
 import com.example.cristobalm.myapplication.R;
 import com.example.cristobalm.myapplication.Services.Globals.InfoNameGlobals;
 import com.example.cristobalm.myapplication.Storage.Globals.FilenameGlobals;
-import com.example.cristobalm.myapplication.Storage.Globals.StateGlobals;
 import com.example.cristobalm.myapplication.Storage.StateStorage;
 import com.example.cristobalm.myapplication.UI.Globals.MainStateGlobals;
-import com.example.cristobalm.myapplication.UI.Globals.VisualSettingGlobals;
-import com.example.cristobalm.myapplication.UI.ListFragment.ListDialog;
-import com.example.cristobalm.myapplication.UI.ListFragment.ListItem;
+import com.example.cristobalm.myapplication.UI.GreatTimeDraggable.GTDragShadowBuilder;
 import com.example.cristobalm.myapplication.UI.ListFragment.ListItemInfo;
 import com.example.cristobalm.myapplication.UI.MainActivity;
 import com.example.cristobalm.myapplication.UI.Timefield;
 
 
-import org.w3c.dom.Node;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.LinkedList;
 
 /**
  * Created by cristobalm on 3/2/17.
@@ -98,6 +85,23 @@ public class TimingService extends Service {
 
     boolean saveBeingCalled = false;
     long last_change_done;
+
+
+    int current_moving_index = -1;
+    public void setCurrentMovingIndex(int s_index){
+        current_moving_index = s_index;
+    }
+    public int getCurrentMovingIndex(){
+        return current_moving_index;
+    }
+
+    GTDragShadowBuilder current_shadow;
+    public void setCurrentShadowBuilder(GTDragShadowBuilder currentShadow){
+        current_shadow = currentShadow;
+    }
+    public Drawable getCurrentShadow(){
+        return current_shadow.getShadow();
+    }
 
 
     public void changeDone(){
@@ -236,7 +240,7 @@ public class TimingService extends Service {
     }
     public String getTitleHint(){
         Log.e("getTitleHint", "current index file: " + getCurrentIndexFile());
-        return "File "+(getIDorder(getCurrentIndexFile())+1) + " (Touch to edit)";
+        return "Sequence "+(getIDorder(getCurrentIndexFile())+1) + "";
     }
 
     public int getMillisEditing(){
@@ -343,11 +347,10 @@ public class TimingService extends Service {
 
     public void removeID(int id){
         if(id == getCurrentIndexFile()){
-            Toast.makeText(main_activity, "Please open other file first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(main_activity, R.string.sequence_delete_warning1, Toast.LENGTH_SHORT).show();
             return;
         }
         loadFile(getCurrentIndexFile());
-        Log.e("removeID", "id:"+ id + " order:" + getIDorder(id)+ ", arrayinfosize:"+ builtListItemInfoArrayList().size());
         reloadOrder();
         getFilesDialogList().removeView(builtListItemInfoArrayList().get(getIDorder(id)).getListItem());
         //builtListItemInfoArrayList().remove(getIDorder(id));
@@ -412,10 +415,11 @@ public class TimingService extends Service {
                     if(filename != null) {
                         listItemInfo.setFile_name(filename);
                     }
-                    listItemInfo.setHint("File " + (i+1));
+                    listItemInfo.setHint("Sequence " + (i+1));
 
                     listItemInfoArrayList.add(listItemInfo);
                 }
+                listItemInfoArrayList.get(f_list_ids.size()-1).getListItem().setLast();
             }else{
                 listItemInfoArrayList = new ArrayList<>();
             }
@@ -476,7 +480,7 @@ public class TimingService extends Service {
                 main_activity.getTitle_list().setText("");
             }
             main_activity.reloadButtonStates();
-            Toast.makeText(main_activity, "New file created", Toast.LENGTH_SHORT).show();
+            Toast.makeText(main_activity, R.string.new_file_created, Toast.LENGTH_SHORT).show();
         }
         listItemInfoArrayList = null;
 
@@ -814,13 +818,15 @@ public class TimingService extends Service {
             if(repeatState){
                 timingNotifications.sendNotification(1,
                         MainActivity.class,
-                        "Finished all countdowns.. Repeating",  InfoNameGlobals.getSound(getSoundInOrder(retrieveTimefields().size()-1)), Notification.PRIORITY_HIGH);
+                        getResources().getString(R.string.finished_countdowns_repeating),
+                        InfoNameGlobals.getSound(getSoundInOrder(retrieveTimefields().size()-1)), Notification.PRIORITY_HIGH);
 
                 timerScheduling(-1);
             }else{
                 timingNotifications.sendNotification(1,
                         MainActivity.class,
-                        "Finished all countdowns", InfoNameGlobals.getSound(getFinishSound()), Notification.PRIORITY_HIGH);
+                        getResources().getString(R.string.finished_countdowns),
+                        InfoNameGlobals.getSound(getFinishSound()), Notification.PRIORITY_HIGH);
                 stopTimer();
                 setOffWaitingForScheduled();
 

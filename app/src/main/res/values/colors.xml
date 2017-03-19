@@ -7,11 +7,12 @@
 
     <color name="colorWhite">#FFF</color>
 
-    <color name="colorBackground">#612929</color>
+    <color name="colorBackground">#b24a09</color>
     <color name="colorDescriptionBackground">#e4aa04</color>
-    <color name="colorDraggable">#d8d508</color>
-    <color name="colorCountdownBackground">#ed6e00</color>
-    <color name="colorCountdownBackgroundSelected">#ae5200</color>
+    <color name="colorDraggable">#aeaeae</color>
+    <color name="colorCountdownBackground">#bf006273</color>
+    <color name="colorCountdownBackgroundSelected">#bf00252b</color>
+    <color name="colorCountdownBackgroundWorking">#981b11</color>
     <color name="transparent">#80000000</color>
     <color name="transparent_all">#00000000</color>
 
@@ -25,14 +26,30 @@
     <color name="redBack">#df5e07</color>
 
     <color name="white_some_transparency">#d5ffffff</color>
+    <color name="white_more_transparency">#74ff9d9d</color>
 
-
-    <color name="rednote">#501c00</color>
+<!--  YAAAAAAAA -->
+    <color name="rednote">#ddffdada</color>
 
     <color name="redbackgroundNotif">#c40909</color>
     <color name="redbackgroundCountdownNotif">#750000</color>
 
     <color name="onTouchMusicIcon">#1e1a1a</color>
+
+
+    <!-- draggable colors -->
+    <color name="upbar">#ff8133</color>
+    <color name="upbar2">#202020</color>
+    <color name="upbar3">#d4000000</color>
+    <color name="nicegray">#2f2f2f</color>
+    <color name="nicegray2">#131313</color>
+
+    <!-- sidebar colors -->
+    <color name="sidebar_vertical">#a98cfff9</color>
+
+
+    <color name="light_gray_a">#d68f8e8e</color>
+    <color name="white_transparent_ok">#d8ffffff</color>
 
 
 

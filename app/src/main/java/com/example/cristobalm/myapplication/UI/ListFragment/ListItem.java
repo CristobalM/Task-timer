@@ -124,7 +124,7 @@ public class ListItem extends LinearLayout {
         //LayoutParams edit_button_params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         LayoutParams delete_button_params = new LayoutParams(delete_button_width, delete_button_width);
 
-        Drawable delete_button_drawable =getDrawableCompat(R.drawable.ic_black_cross);
+        Drawable delete_button_drawable =getDrawableCompat(R.drawable.ic_del_but_1);
 
         //edit_button.setImageDrawable();
         delete_button.setImageDrawable(delete_button_drawable);
@@ -168,7 +168,7 @@ public class ListItem extends LinearLayout {
         paint.setStrokeWidth(3);
         paint.setStyle(Paint.Style.STROKE);
         paint.setARGB(255, 0, 0, 0);
-        paint.setPathEffect(new DashPathEffect(new float[]{1,2}, 0));
+        paint.setPathEffect(new DashPathEffect(new float[]{2,20}, 0));
 
         setWillNotDraw(false);
 
@@ -178,11 +178,23 @@ public class ListItem extends LinearLayout {
     }
 
 
+    public void setLast(){
+        is_the_last = true;
+    }
+    public void removeLast(){
+        is_the_last = false;
+    }
+    boolean is_the_last = false;
+
+
     @Override
     protected void onDraw(Canvas canvas){
         path.moveTo(0,0);
         path.lineTo(getMeasuredWidth()-delete_button_width, 0);
-
+        if(is_the_last){
+            path.moveTo(0, getMeasuredHeight());
+            path.lineTo(getMeasuredWidth()-delete_button_width, getMeasuredHeight());
+        }
 
 
         canvas.drawPath(path, paint);

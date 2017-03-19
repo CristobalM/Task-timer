@@ -67,11 +67,6 @@ public class TimingNotifications {
         notificationManager.cancel(nID);
     }
 
-    public void sendTimeNotification(int nID, String description, int millis, int notification_sound){
-        String text = "On " + description +
-                ", remaining time: " + TimeContainer.getTimeString(millis);
-        sendNotification(nID, MainActivity.class, text, notification_sound, Notification.PRIORITY_DEFAULT);
-    }
 
     public NotificationManager getNotificationManager(){
         return notificationManager;

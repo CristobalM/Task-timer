@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
@@ -94,9 +95,14 @@ public class GreatTimePickerFragment extends DialogFragment implements GreatTime
         }
 
         greatTimePickerDialog = new GreatTimePickerDialog(getActivity(), R.style.MyDialogTheme, this, millis);
-        greatTimePickerDialog.setTitle("Select time");
 
-        return greatTimePickerDialog.create();
+        AlertDialog to_return = greatTimePickerDialog.create();
+        if(to_return != null && to_return.getWindow() != null) {
+            to_return.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+            //greatTimePickerDialog.setTitle("Select time");
+
+        return to_return;
     }
 
     @Override

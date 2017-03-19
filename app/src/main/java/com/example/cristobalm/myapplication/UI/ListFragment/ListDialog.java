@@ -26,12 +26,15 @@ import java.util.ArrayList;
 public class ListDialog extends AlertDialog.Builder {
 
     LinearLayout list;
+    View view;
     public ListDialog(Context context, int theme, ArrayList<ListItemInfo> list_items ){
         super(context, theme);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.lists_dialog, null);
+        view = inflater.inflate(R.layout.lists_dialog, null);
 
+        view.setLayoutParams(new ViewGroup.LayoutParams(view.getMeasuredWidth()/2, view.getMeasuredHeight()));
+        view.invalidate();
         //ArrayList<ListItemInfo> list_items = builtListItemInfoArrayList();
         list = (LinearLayout) view.findViewById(R.id.filenames_list);
 
@@ -44,12 +47,17 @@ public class ListDialog extends AlertDialog.Builder {
                 }
                 list.addView(auxListItem);
             }
+            //list_items.get(list_items.size()-1).getListItem().setLast();
         }
 
 
         //this.list_items = timingService.builtListItemInfoArrayList();
 
-        setView(view);
+        //setView(view);
+
+    }
+    public View getView(){
+        return view;
     }
 
     public LinearLayout getList(){
